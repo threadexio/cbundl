@@ -277,7 +277,7 @@ $ export PATH="~/.bin:$PATH"
 > [!NOTE]
 > The above will probably not work on non-Bourne shells.
 
-This will download the latest `cbundl` binary to `~/.bin`. Then if you restart your shell, it should be immediately available. You can check with `cbundl --version`.
+You can then download the latest `cbundl` binary to `~/.bin` from [Releases][gh-releases]. Then if you restart your shell, it should be immediately available. You can check with `cbundl --version`.
 
 ## Building
 
