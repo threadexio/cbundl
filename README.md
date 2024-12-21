@@ -42,6 +42,7 @@ A simple tool that makes self-contained abominations of C code called bundles. I
   * [cargo](#cargo)
   * [manually](#manually)
 * [Building](#building)
+* [License](#license)
 
 ## Usage
 
