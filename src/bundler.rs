@@ -68,7 +68,7 @@ impl Bundler {
         let line2 = formatcp!("{CRATE_REPOSITORY}");
         let line3 = format!("Generated at: {}", format_date(Local::now()));
 
-        let art_width = ART.into_iter().map(|x| x.len()).max().unwrap();
+        let art_width = ART.iter().map(|x| x.len()).max().unwrap();
         let banner_width = MIN_WIDTH.max(art_width).max(line1.len()).max(line2.len()) + PADDING;
 
         writeln!(out, "/**")?;

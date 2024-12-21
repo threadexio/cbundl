@@ -6,6 +6,7 @@ pub mod include;
 pub mod source_file;
 
 fn consume_whitespace(iter: &mut Peekable<Chars<'_>>, required: bool) -> Option<()> {
+    #[allow(clippy::collapsible_if)]
     if required {
         if !iter.next()?.is_whitespace() {
             return None;
