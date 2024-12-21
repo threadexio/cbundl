@@ -5,24 +5,23 @@ authors = ["threadexio"]
 edition = "2021"
 description = "webpack but for C code."
 readme = "README.md"
-homrpage = "https://github.com/threadexio/cbundl"
+homepage = "https://github.com/threadexio/cbundl"
 repository = "https://github.com/threadexio/cbundl"
 license = "Apache-2.0"
 keywords = ["bundle", "c", "bundler", "code", "parser"]
 categories = ["command-line-utilities", "development-tools::build-utils"]
 
 [dependencies]
-chrono = "0.4.39"
-clap = { version = "4.5.23", features = ["derive"] }
-color-eyre = "0.6.3"
-const_format = "0.2.34"
-env_logger = "0.11.5"
-eyre = "0.6.12"
-log = "0.4.22"
-owo-colors = "4.1.0"
-pathdiff = "0.2.3"
-petgraph = "0.6.5"
-thiserror = "2.0.8"
+chrono = { version = "0.4" }
+clap = { version = "4.5", features = ["derive"] }
+color-eyre = { version = "0.6" }
+const_format = { version = "0.2" }
+env_logger = { version = "0.11" }
+eyre = { version = "0.6" }
+log = { version = "0.4" }
+owo-colors = { version = "4.1" }
+petgraph = { version = "0.6" }
+thiserror = { version = "2.0" }
 
 [build-dependencies]
 chrono = "0.4.39"
