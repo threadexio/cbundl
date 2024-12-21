@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use eyre::{Context, ContextCompat, Result};
+use eyre::{bail, Context, ContextCompat, Result};
 
 use super::directive::Directive;
 use super::include::{Include, IncludeKind};
@@ -32,7 +32,7 @@ impl SourceFile {
                         })?;
 
                     if include.kind != IncludeKind::Local {
-                        panic!("cbundl supports only local includes");
+                        bail!("cbundl supports only local includes");
                     }
 
                     includes.push(include.path);
