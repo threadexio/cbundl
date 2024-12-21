@@ -1,5 +1,14 @@
+[crates-io]: https://crates.io/crates/cbundl
+[gh-actions]: https://github.com/threadexio/cbundl/actions/workflows/ci.yaml
+[gh-releases]: https://github.com/threadexio/cbundl/releases
+[license]: https://github.com/threadexio/cbundl/blob/master/LICENSE
+
+[license-badge]: https://img.shields.io/github/license/threadexio/cbundl?style=for-the-badge&logo=github&label=license&labelColor=%230e202e&color=%23d6e4ef
+[tests-badge]: https://img.shields.io/github/actions/workflow/status/threadexio/cbundl/ci.yaml?branch=master&style=for-the-badge&logo=artifacthub&labelColor=%230e202e
+[version-badge]: https://img.shields.io/crates/v/cbundl?style=for-the-badge&logo=buffer&labelColor=%230e202e&color=%23354c5d
+
 <div align="center">
-<img src="./assets/logo.svg" width="50%" alt="logo">
+<img src="https://raw.githubusercontent.com/threadexio/cbundl/refs/heads/master/assets/logo.svg" width="50%" alt="logo">
 
 # cbundl
 
@@ -9,7 +18,9 @@
 
 </p>
 
-<!-- TODO: badges -->
+[![license-badge]][license]
+[![tests-badge]][gh-actions]
+[![version-badge]][crates-io]
 
 </div>
 
@@ -241,10 +252,10 @@ The `impl` directive, also called an implementation directive, informs `cbundl` 
 
 ## Installation
 
-`cbundl` provides pre-built release binaries in [Releases](https://github.com/threadexio/cbundl/releases) for all 3 major desktop platforms.
+`cbundl` provides pre-built release binaries in [Releases][gh-releases] for all 3 major desktop platforms.
 
 > [!NOTE]
-> Those binaries are built in Github Actions. However if you still don't trust the binaries, I don't blame you. Proceed to the [Building](#building) section.
+> Those binaries are built in [Github Actions][gh-actions]. However if you still don't trust the binaries, I don't blame you. Proceed to the [Building](#building) section.
 
 ### cargo
 
