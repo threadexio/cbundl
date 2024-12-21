@@ -2,10 +2,13 @@
 [gh-actions]: https://github.com/threadexio/cbundl/actions/workflows/ci.yaml
 [gh-releases]: https://github.com/threadexio/cbundl/releases
 [license]: https://github.com/threadexio/cbundl/blob/master/LICENSE
+[art-license]: https://github.com/threadexio/cbundl/blob/master/assets/LICENSE
 
 [license-badge]: https://img.shields.io/github/license/threadexio/cbundl?style=for-the-badge&logo=github&label=license&labelColor=%230e202e&color=%23d6e4ef
 [tests-badge]: https://img.shields.io/github/actions/workflow/status/threadexio/cbundl/ci.yaml?branch=master&style=for-the-badge&logo=artifacthub&labelColor=%230e202e
 [version-badge]: https://img.shields.io/crates/v/cbundl?style=for-the-badge&logo=buffer&labelColor=%230e202e&color=%23354c5d
+
+[cc-by-nc-4-int]: https://creativecommons.org/licenses/by-nc/4.0
 
 <div align="center">
 <img src="https://raw.githubusercontent.com/threadexio/cbundl/refs/heads/master/assets/logo.svg" width="50%" alt="logo">
@@ -242,7 +245,7 @@ The directive means different things depending on what `<body>` is. At this time
 
 **Format:** `// cbundl: bundle`
 
-The bundle directive must always appear above a local `#include` in the previous line, without any other comments or code in between. It informs `cbundl` of a dependency relation between the current file and the `#include`d file. An intuitive way to think about it, is that the current file "wants" the `#include`d file. Any `#include`s annotated with a bundle directive will not appear in the bundle. Additionally, any `#include`s not annotated with a bundle directive will be left as-is. This allows you to create a kind of semi-bundle where even the final bundle includes local files. I can't image where that would be useful, but you _can_ do it.
+The bundle directive must always appear exactly above a local `#include`, without any other comments or code in between. It informs `cbundl` of a dependency relation between the current file and the `#include`d file. An intuitive way to think about it, is that the current file "wants" the `#include`d file. Any `#include`s annotated with a bundle directive will not appear in the bundle. Additionally, any `#include`s not annotated with a bundle directive will be left as-is. This allows you to create a kind of semi-bundle where even the final bundle includes local files. I can't imagine where that would be useful, but you _can_ do it.
 
 #### impl
 
@@ -313,3 +316,8 @@ $ cargo build --release # for the release build
 ```
 
 Then you can run `cbundl` through `cargo` with `cargo run` or by running it directly from `target/debug/cbundl` or `target/release/cbundl`, depending on which you built.
+
+## License
+
+* All code and contributions in this repository are licensed under the Apache 2.0 license, a copy of which can be found [here][license].
+* All artwork in this repository is licensed under [Creative Commons Attribution-NonCommercial 4.0 International][cc-by-nc-4-int]. A copy of the license can be found [here][art-license].
