@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./assets/logo.svg" width=256 alt="logo">
+<img src="./assets/logo.svg" width="50%" alt="logo">
 
 # cbundl
 
