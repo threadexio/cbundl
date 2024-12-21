@@ -34,7 +34,7 @@ A simple tool that makes self-contained abominations of C code called bundles. I
   * [Directives](#directives)
     * [bundle](#bundle)
     * [impl](#impl)
-  * [Workflow]
+  * [Workflow](#workflow)
 * [Installation](#installation)
   * [cargo](#cargo)
   * [manually](#manually)
