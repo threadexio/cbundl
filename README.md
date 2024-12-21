@@ -1,15 +1,15 @@
 <div align="center">
-  <img src="./assets/logo.svg" width=512 alt="logo">
+<img src="./assets/logo.svg" width=256 alt="logo">
 
-  # cbundl
+# cbundl
 
-  <p>
+<p>
 
-    `webpack` but for C code.
+[`webpack`](https://webpack.js.org) but for C code.
 
-  </p>
+</p>
 
-  <!-- TODO: badges -->
+<!-- TODO: badges -->
 
 </div>
 
@@ -38,7 +38,7 @@ Consider the following C code (don't worry about the `// cbundl` comments for no
 
 `frob.h`
 
-```
+```c
 #ifndef _FOO_H
 #define _FOO_H
 
@@ -57,7 +57,7 @@ void frobinate(struct frobinator* frob);
 
 `frob.c`
 
-```
+```c
 // cbundl: bundle
 #include "frob.h"
 
@@ -77,7 +77,7 @@ void frobinate(struct frobinator* frob) {
 
 `main.c`
 
-```
+```c
 #include <stdio.h>
 
 // cbundl: bundle
@@ -114,7 +114,7 @@ $ cbundl main.c -o final.c
 
 The above command will parse `main.c` and figure out what dependencies it has. In this example, `main.c` wants `stdio.h` and `frob.h`. Notice the comment above the `#include "frob.h"`. Comments that begin with `// cbundl:` are called "directives" and give special instructions to `cbundl`. The directive above `frob.h` tells `cbundl` that, to build the final bundle, it needs to include `frob.h`. The directive at the end of `frob.h` tells `cbundl` that the implementation for at least one of the symbols declared by `frob.h` lives in `frob.c`. This tells `cbundl` to include `frob.c` inside the resulting bundle. That's it. That's the entire tool :clap:. The file `final.c` then contains:
 
-```
+```c
 /**
  *
  *                        )                (    (
