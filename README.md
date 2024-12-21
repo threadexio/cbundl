@@ -213,6 +213,9 @@ Options:
 
           [default: clang-format]
 
+      --deterministic
+          Output a deterministic bundle.
+
   -o, --output <path>
           Specify where to write the resulting bundle.
 
