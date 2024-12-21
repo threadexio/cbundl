@@ -3,6 +3,7 @@ use std::fmt::{self, Write};
 use chrono::{DateTime, Local};
 use const_format::formatcp;
 use eyre::{Context, Result};
+use rand::seq::SliceRandom;
 
 use crate::consts::{CRATE_NAME, CRATE_REPOSITORY, SHORT_VERSION};
 use crate::display::format_date;
@@ -55,6 +56,13 @@ impl Bundler {
         const MIN_WIDTH: usize = 56;
         const PADDING: usize = 4;
 
+        const QUOTES: &[&str] = &[
+            "If everything seems to be under control, youre not going fast enough. ",
+            "Half empty or half full, the glass is still refillable.",
+            "Experience is not what happens to a person; its what a person does with what happens to them.",
+            "Opportunity is missed by most because its dressed in overalls and looks like work."
+        ];
+
         const ART: &[&str] = &[
             r#"         )                (    ("#,
             r#"      ( /(    (           )\ ) )\"#,
@@ -90,6 +98,18 @@ impl Bundler {
         writeln!(out, " *")?;
         writeln!(out, " * {:^1$}", line3, banner_width)?;
         writeln!(out, " *")?;
+
+        if !self.deterministic {
+            let quote = QUOTES
+                .choose(&mut rand::thread_rng())
+                .copied()
+                .unwrap_or("");
+            let line4 = format!("\"{quote}\"");
+
+            writeln!(out, " * {:^1$}", line4, banner_width)?;
+            writeln!(out, " * {:>1$}", "- some guy on the internet", banner_width)?;
+        }
+
         writeln!(out, " */")?;
         writeln!(out)?;
 
