@@ -1,0 +1,61 @@
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUSTFLAGS: -D warnings
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo fmt --check
+      - run: cargo clippy
+
+  build:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [
+          { name: linux,  os: ubuntu-latest,  build: cbundl,     artifact: cbundl-linux   },
+          { name: darwin, os: macos-latest,   build: cbundl,     artifact: cbundl-darwin  },
+          { name: win,    os: windows-latest, build: cbundl.exe, artifact: cbundl-win.exe },
+        ]
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 15
+    name: build for ${{ matrix.platform.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: |
+          cargo build --release
+          mv target/release/${{ matrix.platform.build }} target/release/${{ matrix.platform.artifact }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ matrix.platform.name }}
+          path: target/release/${{ matrix.platform.artifact }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          prerelease: true
+          make_latest: false
+          fail_on_unmatched_files: true
+          files: |
+            ./artifact-*/*
