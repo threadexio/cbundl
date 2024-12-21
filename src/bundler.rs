@@ -1,6 +1,6 @@
 use std::fmt::{self, Write};
 
-use chrono::Local;
+use chrono::{DateTime, Local};
 use const_format::formatcp;
 use eyre::{Context, Result};
 
@@ -12,6 +12,7 @@ use crate::source::Source;
 #[derive(Debug, Clone)]
 pub struct Bundler {
     pub formatter: Option<Formatter>,
+    pub deterministic: bool,
 }
 
 impl Bundler {
@@ -64,9 +65,15 @@ impl Bundler {
             r#"\__| |_.__/ \_,_||_||_| \__,_||_|"#,
         ];
 
+        let generated_at = if self.deterministic {
+            format_date(DateTime::UNIX_EPOCH)
+        } else {
+            format_date(Local::now())
+        };
+
         let line1 = formatcp!("{CRATE_NAME} {SHORT_VERSION}");
         let line2 = formatcp!("{CRATE_REPOSITORY}");
-        let line3 = format!("Generated at: {}", format_date(Local::now()));
+        let line3 = format!("Generated at: {}", generated_at);
 
         let art_width = ART.iter().map(|x| x.len()).max().unwrap();
         let banner_width = MIN_WIDTH.max(art_width).max(line1.len()).max(line2.len()) + PADDING;

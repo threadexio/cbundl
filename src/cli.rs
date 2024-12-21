@@ -36,6 +36,13 @@ pub struct GlobalArgs {
     pub formatter: PathBuf,
 
     #[arg(
+        long = "deterministic",
+        help = "Output a deterministic bundle.",
+        default_value_t = false
+    )]
+    pub deterministic: bool,
+
+    #[arg(
         short = 'o',
         long = "output",
         help = "Specify where to write the resulting bundle.",
@@ -58,6 +65,7 @@ pub fn run() -> Result<()> {
         formatter: some_if(!args.no_format, || Formatter {
             exe: args.formatter,
         }),
+        deterministic: args.deterministic,
     };
 
     let bundle = bundler
