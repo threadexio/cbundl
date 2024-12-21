@@ -34,6 +34,7 @@ A simple tool that makes self-contained abominations of C code called bundles. I
   * [Directives](#directives)
     * [bundle](#bundle)
     * [impl](#impl)
+  * [Workflow]
 * [Installation](#installation)
   * [cargo](#cargo)
   * [manually](#manually)
@@ -249,6 +250,28 @@ The bundle directive must always appear above a local `#include` in the previous
 
 The `impl` directive, also called an implementation directive, informs `cbundl` that the current file is implemented by the file specified by `<path>`. This directive can appear any number of times in the file (if the implementation is split across many other files). It can also appear anywhere in the file, but convention is that `impl` directives appear only at either the start or the end of the file. Just like `#include`-ing `.c` files, using an implementation directive that points to a `.h` file is generally considered bad practice.
 
+### Workflow
+
+Ok that's all cool and all but how do I integrate it into my workflow? I'm glad you asked. Simple, instead of running just:
+
+```bash
+$ cc ...
+```
+
+You do:
+
+```bash
+$ cbundl main.c > bundle.c
+$ cc bundle.c -o main
+```
+
+Just make the bundle with `cbundl` and compile the bundle instead of your source files. You can also write a simple `Makefile` that does this:
+
+```make
+build:
+  cbundl main.c > bundle.c
+  cc bundle.c -o main
+```
 
 ## Installation
 
