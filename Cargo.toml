@@ -1,9 +1,15 @@
 [package]
 name = "cbundl"
-description = "webpack but for C code."
-repository = "https://github.com/threadexio/cbundl"
 version = "0.1.0"
+authors = ["threadexio"]
 edition = "2021"
+description = "webpack but for C code."
+readme = "README.md"
+homrpage = "https://github.com/threadexio/cbundl"
+repository = "https://github.com/threadexio/cbundl"
+license = "Apache-2.0"
+keywords = ["bundle", "c", "bundler", "code", "parser"]
+categories = ["command-line-utilities", "development-tools::build-utils"]
 
 [dependencies]
 chrono = "0.4.39"
