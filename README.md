@@ -40,6 +40,7 @@ A simple tool that makes self-contained abominations of C code called bundles. I
   * [Workflow](#workflow)
 * [Installation](#installation)
   * [cargo](#cargo)
+  * [nix](#nix)
   * [manually](#manually)
 * [Building](#building)
 * [License](#license)
@@ -294,6 +295,18 @@ If you happen to have `cargo` installed you can simply do:
 ```bash
 $ cargo install cbundl
 ```
+
+### nix
+
+If you happen to have `nix` with flakes enabled, you can do:
+
+```bash
+$ nix run 'github:threadexio/cbundl'
+```
+
+Directly without even cloning the repository. Isn't Nix great?
+
+If you want to install `cbundl` permanently, you can add the flake to your system configuration.
 
 ### manually
 
