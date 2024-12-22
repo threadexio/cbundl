@@ -21,7 +21,10 @@ where
     I: IntoIterator<Item = S>,
     S: AsRef<OsStr>,
 {
-    let p = Command::new(program).args(args).output().unwrap();
+    let p = Command::new(program)
+        .args(args)
+        .output()
+        .expect(&format!("missing tool '{program}'"));
 
     if p.status.success() {
         Some(from_utf8(&p.stdout).unwrap().trim().to_owned())
