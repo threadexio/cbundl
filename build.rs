@@ -24,7 +24,7 @@ where
     let p = Command::new(program)
         .args(args)
         .output()
-        .expect(&format!("missing tool '{program}'"));
+        .unwrap_or_else(|_| panic!("missing tool '{program}'"));
 
     if p.status.success() {
         Some(from_utf8(&p.stdout).unwrap().trim().to_owned())
