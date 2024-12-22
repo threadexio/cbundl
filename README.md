@@ -301,8 +301,13 @@ $ cargo install cbundl
 If you happen to have `nix` with flakes enabled, you can do:
 
 ```bash
-$ nix run 'github:threadexio/cbundl'
+$ nix run 'github:threadexio/cbundl/master'
+# or
+$ nix run 'github:threadexio/cbundl/vX.X.X'
 ```
+
+> [!NOTE]
+> The above will run `cbundl` from the `master` branch. You should generally use the second form to pin down exactly which version you want.
 
 Directly without even cloning the repository. Isn't Nix great?
 
