@@ -310,17 +310,32 @@ If you want to install `cbundl` permanently, you can add the flake to your syste
 
 ### manually
 
-`cbundl` is a standalone binary. This means you can download (or build) the appropriate binary for your system and place it in a location included in `PATH` and be done. You can install `cbundl` only for your own user by doing:
+`cbundl` is a standalone binary. This means you can very easily install it only for your own user. The following will download the latest linux binary from [Releases][releases] into `~/.bin`.
 
 ```bash
-$ mkdir ~/.bin
-$ export PATH="~/.bin:$PATH"
+$ mkdir -p ~/.bin
+$ curl --proto '=https' --tlsv1.2 -sSfL 'https://github.com/threadexio/cbundl/releases/latest/download/cbundl-linux' -o ~/.bin/cbundl
+$ chmod +x ~/.bin/cbundl
 ```
 
-> [!NOTE]
-> The above will probably not work on non-Bourne shells.
+You can then add `~/.bin` to `PATH` so you can use the tool like any other command.
 
-You can then download the latest `cbundl` binary to `~/.bin` from [Releases][gh-releases]. Then if you restart your shell, it should be immediately available. You can check with `cbundl --version`.
+* Temporarily
+
+```bash
+$ export PATH="$HOME/.bin:$PATH"
+```
+
+* Permanently
+
+```bash
+$ echo -e '\nexport PATH="$HOME/.bin:$PATH"\n' >> ~/.profile
+$ exec bash
+```
+
+If all goes well, you should then be able to do `cbundl --version`.
+
+You could however not do any of that and simply download it somewhere and use the full path to run it.
 
 ## Building
 
