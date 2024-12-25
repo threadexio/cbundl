@@ -147,6 +147,10 @@ The above command will parse `main.c` and figure out what dependencies it has. I
  *
  *      Generated at: XXX XX XXX XXX XX:XX:XX (UTC+XX:XX)
  *
+ *
+ * Time is an illusion. Lunchtime doubly so.
+ *   - The Hitchhiker's Guide to the Galaxy
+ *
  */
 
 /**
