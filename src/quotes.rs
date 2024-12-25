@@ -9,7 +9,7 @@ pub struct Quote<'a> {
     quote: &'static BuiltInQuote,
 }
 
-impl<'a> Quote<'a> {
+impl Quote<'_> {
     pub fn lines(&self) -> QuoteLinesIter<'_> {
         QuoteLinesIter {
             inner: self.quote.text.iter(),
@@ -17,7 +17,7 @@ impl<'a> Quote<'a> {
     }
 
     pub fn author(&self) -> &str {
-        &self.quote.author
+        self.quote.author
     }
 }
 
