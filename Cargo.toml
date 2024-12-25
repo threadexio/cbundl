@@ -60,3 +60,25 @@ missing_errors_doc = "allow"
 all = "warn"
 broken_intra_doc_links = "warn"
 missing_crate_level_docs = "warn"
+
+[profile.release]
+# This tool does not do heavy computations so `opt-level` is kind of irrelevant.
+# Might as well optimize for size.
+opt-level = "s"
+
+# This is a release build, we don't need symbols.
+strip = "symbols" 
+
+# Fat LTO seems to also reduce binary size. Yes, it requires substantially more
+time to build. For this reason we provide the `release-no-lto` profile.
+lto = "fat"
+
+# We don't make use of unwinds anywhere and unwind code is a large part of the
+# final binary, so...
+panic = "abort"
+
+[profile.release-no-lto]
+inherits = "release"
+
+# Thin LTO is the default and doesn't take that much time to build.
+lto = "thin"
