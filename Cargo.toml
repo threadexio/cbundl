@@ -70,7 +70,7 @@ opt-level = "s"
 strip = "symbols" 
 
 # Fat LTO seems to also reduce binary size. Yes, it requires substantially more
-time to build. For this reason we provide the `release-no-lto` profile.
+# time to build. For this reason we provide the `release-no-lto` profile.
 lto = "fat"
 
 # We don't make use of unwinds anywhere and unwind code is a large part of the
