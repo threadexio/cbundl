@@ -21,6 +21,7 @@ eyre = { version = "0.6" }
 log = { version = "0.4" }
 owo-colors = { version = "4.1" }
 petgraph = { version = "0.6" }
+rand = "0.8.5"
 thiserror = { version = "2.0" }
 
 [build-dependencies]

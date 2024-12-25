@@ -7,12 +7,14 @@ use eyre::{Context, Result};
 use crate::consts::{CRATE_NAME, CRATE_REPOSITORY, SHORT_VERSION};
 use crate::display::format_date;
 use crate::formatter::Formatter;
+use crate::quotes::Quotes;
 use crate::source::Source;
 
 #[derive(Debug, Clone)]
 pub struct Bundler {
     pub formatter: Option<Formatter>,
     pub deterministic: bool,
+    pub quotes: Quotes,
 }
 
 impl Bundler {
@@ -71,6 +73,9 @@ impl Bundler {
             format_date(Local::now())
         };
 
+        // TODO: Honor `deterministic`.
+        let quote = self.quotes.choose();
+
         let line1 = formatcp!("{CRATE_NAME} {SHORT_VERSION}");
         let line2 = formatcp!("{CRATE_REPOSITORY}");
         let line3 = format!("Generated at: {}", generated_at);
@@ -89,6 +94,10 @@ impl Bundler {
         writeln!(out, " * {:^1$}", line2, banner_width)?;
         writeln!(out, " *")?;
         writeln!(out, " * {:^1$}", line3, banner_width)?;
+        writeln!(out, " *")?;
+        writeln!(out, " *")?;
+        quote.lines().try_for_each(|x| writeln!(out, " * {x}"))?;
+        writeln!(out, " *   - {}", quote.author())?;
         writeln!(out, " *")?;
         writeln!(out, " */")?;
         writeln!(out)?;

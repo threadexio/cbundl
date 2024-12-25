@@ -13,6 +13,7 @@ mod consts;
 mod display;
 mod formatter;
 mod parse;
+mod quotes;
 mod source;
 
 fn main() -> ExitCode {

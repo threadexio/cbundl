@@ -1,5 +1,7 @@
 use std::env;
 use std::ffi::OsStr;
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::process::Command;
 use std::str::from_utf8;
 use std::sync::LazyLock;
@@ -66,6 +68,8 @@ cached_getter!(rustc_version, String, str, {
     run(rustc(), ["--version"]).unwrap_or_else(|| "<rustc unknown>".into())
 });
 
+cached_getter!(out_dir, String, str, { env::var("OUT_DIR").unwrap() });
+
 pub fn is_vcs_dirty() -> bool {
     static CACHE: LazyLock<bool> = LazyLock::new(|| {
         let git = Command::new("git")
@@ -83,6 +87,62 @@ pub fn build_is_debug() -> bool {
     build_profile() == "debug"
 }
 
+fn write_quotes(input: &str) {
+    let input_file = BufReader::new(
+        File::options()
+            .read(true)
+            .open(input)
+            .expect("failed to open input quote file"),
+    );
+
+    let mut out = BufWriter::new(
+        File::options()
+            .write(true)
+            .truncate(true)
+            .create(true)
+            .open(format!("{}/quotes.rs", out_dir()))
+            .expect("failed to open quote output file"),
+    );
+
+    writeln!(
+        out,
+        r#"
+struct BuiltInQuote {{
+    text: &'static [&'static str],
+    author: &'static str,
+}}
+
+const BUILT_IN_QUOTES: &[BuiltInQuote] = &["#
+    )
+    .unwrap();
+
+    input_file
+        .lines()
+        .map(|x| x.expect("failed to read quote"))
+        .filter(|x| !x.is_empty())
+        .filter(|x| !x.starts_with('#'))
+        .for_each(|line| {
+            let mut fields = line.split('|');
+
+            let raw_quote_text = fields.next().expect("missing quote text");
+            let quote_text_lines = raw_quote_text.split("\\n").map(|x| x.trim());
+
+            let author = fields.next().expect("missing author").trim();
+
+            writeln!(out, r#"BuiltInQuote {{"#).unwrap();
+
+            writeln!(out, r#"text: &["#).unwrap();
+            quote_text_lines.for_each(|line| writeln!(out, r#""{line}","#).unwrap());
+            writeln!(out, "],").unwrap();
+
+            writeln!(out, r#"author: "{author}","#).unwrap();
+
+            writeln!(out, r#"}},"#).unwrap();
+        });
+
+    writeln!(out, r#"];"#).unwrap();
+}
+
 fn main() {
     rerun_if_changed(".git/HEAD");
 
@@ -93,4 +153,6 @@ fn main() {
     set_env("RUSTC_VERSION", rustc_version());
     set_env_bool("IS_VCS_DIRTY", is_vcs_dirty());
     set_env_bool("BUILD_IS_DEBUG", build_is_debug());
+
+    write_quotes("src/quotes.txt");
 }

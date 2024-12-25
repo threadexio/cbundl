@@ -9,6 +9,7 @@ use crate::bundler::Bundler;
 use crate::consts::{CRATE_DESCRIPTION, LONG_VERSION, SHORT_VERSION};
 use crate::display::display_path;
 use crate::formatter::Formatter;
+use crate::quotes::Quotes;
 use crate::source::Sources;
 
 #[derive(Debug, Clone, Parser)]
@@ -66,6 +67,7 @@ pub fn run() -> Result<()> {
             exe: args.formatter,
         }),
         deterministic: args.deterministic,
+        quotes: Quotes {},
     };
 
     let bundle = bundler
