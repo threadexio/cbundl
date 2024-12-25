@@ -10,6 +10,13 @@ pub struct Quote<'a> {
 }
 
 impl Quote<'_> {
+    fn new(quote: &'static BuiltInQuote) -> Self {
+        Self {
+            _marker: PhantomData,
+            quote,
+        }
+    }
+
     pub fn lines(&self) -> QuoteLinesIter<'_> {
         QuoteLinesIter {
             inner: self.quote.text.iter(),
@@ -42,11 +49,12 @@ impl<'a> Iterator for QuoteLinesIter<'a> {
 pub struct Quotes {}
 
 impl Quotes {
-    pub fn choose(&self) -> Quote<'_> {
-        Quote {
-            _marker: PhantomData,
-            quote: choose_random_quote(),
-        }
+    pub fn get(&self, i: usize) -> Option<Quote<'_>> {
+        BUILT_IN_QUOTES.get(i).map(Quote::new)
+    }
+
+    pub fn random(&self) -> Quote<'_> {
+        Quote::new(choose_random_quote())
     }
 }
 

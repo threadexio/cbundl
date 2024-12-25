@@ -73,8 +73,11 @@ impl Bundler {
             format_date(Local::now())
         };
 
-        // TODO: Honor `deterministic`.
-        let quote = self.quotes.choose();
+        let quote = if self.deterministic {
+            self.quotes.get(0).expect("we dont have a single quote :'(")
+        } else {
+            self.quotes.random()
+        };
 
         let line1 = formatcp!("{CRATE_NAME} {SHORT_VERSION}");
         let line2 = formatcp!("{CRATE_REPOSITORY}");
