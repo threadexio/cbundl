@@ -15,6 +15,7 @@ mod formatter;
 mod parse;
 mod quotes;
 mod source;
+mod minify;
 
 fn main() -> ExitCode {
     setup();

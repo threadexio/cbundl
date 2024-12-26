@@ -9,12 +9,14 @@ use crate::display::format_date;
 use crate::formatter::Formatter;
 use crate::quotes::Quotes;
 use crate::source::Source;
+use crate::minify::Minify;
 
 #[derive(Debug, Clone)]
 pub struct Bundler {
     pub formatter: Option<Formatter>,
     pub deterministic: bool,
     pub quotes: Quotes,
+    pub minify: Option<Minify>
 }
 
 impl Bundler {
@@ -40,8 +42,16 @@ impl Bundler {
             writeln!(out, " */")?;
             writeln!(out)?;
 
-            out.write_str(&source.content)?;
-            if !source.content.ends_with("\n\n") {
+            let mut content = source.content.clone();
+
+            if let Some(minifier) = &self.minify {
+                content = minifier.minify(&content).expect("minification failed");
+                println!("{}", content);
+            }
+
+            // Use the minified content instead of the original source content
+            out.write_str(&content)?; // Change this line to use minified content
+            if !content.ends_with("\n\n") {
                 writeln!(out)?;
             }
 

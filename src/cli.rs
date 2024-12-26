@@ -11,6 +11,7 @@ use crate::display::display_path;
 use crate::formatter::Formatter;
 use crate::quotes::Quotes;
 use crate::source::Sources;
+use crate::minify::Minify;
 
 #[derive(Debug, Clone, Parser)]
 #[command(
@@ -20,10 +21,14 @@ use crate::source::Sources;
     long_about = None
 )]
 pub struct GlobalArgs {
+    #[arg(help = "Path to the entry source file.", value_name = "path", required = true)]
+    pub entry: PathBuf,
+
     #[arg(
         long,
         help = "Don't pass the resulting bundle through the formatter.",
-        default_value_t = false
+        default_value_t = false,
+        
     )]
     pub no_format: bool,
 
@@ -52,15 +57,39 @@ pub struct GlobalArgs {
     )]
     pub output_file: PathBuf,
 
-    #[arg(help = "Path to the entry source file.", value_name = "path")]
-    pub entry: PathBuf,
+    // Minification options
+    #[arg(
+        long,
+        help = "Remove comments from the code.",
+        default_value_t = false
+    )]
+    pub remove_comments: bool,
+
+    #[arg(
+        long,
+        help = "Remove whitespace from the code.",
+        default_value_t = false
+    )]
+    pub remove_whitespace: bool,
+
+    #[arg(
+        long,
+        help = "Shorten variable and function identifiers.",
+        default_value_t = false
+    )]
+    pub shorten_identifiers: bool,
 }
 
 pub fn run() -> Result<()> {
     let args = GlobalArgs::parse();
-    trace!("args = {args:#?}");
 
     let sources = Sources::new(args.entry)?;
+
+    let minifier = Minify::new(
+        args.remove_comments,
+        args.remove_whitespace,
+        args.shorten_identifiers,
+    );
 
     let bundler = Bundler {
         formatter: some_if(!args.no_format, || Formatter {
@@ -68,6 +97,7 @@ pub fn run() -> Result<()> {
         }),
         deterministic: args.deterministic,
         quotes: Quotes {},
+        minify: Some(minifier)
     };
 
     let bundle = bundler
