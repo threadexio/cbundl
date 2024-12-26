@@ -8,14 +8,15 @@
  *              / _| | '_ \| || || ' \))/ _` || |
  *              \__| |_.__/ \_,_||_||_| \__,_||_|
  *
- *                cbundl 0.1.2-debug (9885cb6+)
+ *                cbundl 0.1.2-debug (f260339+)
  *             https://github.com/threadexio/cbundl
  *
- *      Generated at: Thu 26 Dec 2024 18:20:06 (UTC+02:00)
+ *      Generated at: Thu 26 Dec 2024 18:37:28 (UTC+02:00)
  *
  *
- * Every evening I died, and every evening I was born again, resurrected.
- *   - Fight Club
+ * You'd think the rain would've cooled things down.
+ * All it did was make the heat wet.
+ *   - Rear Window
  *
  */
 
@@ -24,11 +25,11 @@
  */
 
 #include <stdio.h>
-int v1() {
-  int v3 = 5;
-  printf("Value of x: %d\n", v3);
-  for (int v5 = 0; v4 < 3; v4++) {
-    printf("This is loop iteration: %d\n", v4);
+int main() {
+  int v1 = 5;
+  printf("Value of x: %d\n", v0);
+  for (int v3 = 0; v2 < 3; v2++) {
+    printf("This is loop iteration: %d\n", v2);
   }
   return 0;
 }
