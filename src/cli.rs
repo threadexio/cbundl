@@ -5,10 +5,12 @@ use std::path::{Path, PathBuf};
 use clap::Parser;
 use eyre::{Context, Result};
 
+use crate::banner::Banner;
 use crate::bundler::Bundler;
 use crate::consts::{CRATE_DESCRIPTION, LONG_VERSION, SHORT_VERSION};
 use crate::display::display_path;
 use crate::formatter::Formatter;
+use crate::pipeline::Pipeline;
 use crate::quotes::Quotes;
 use crate::source::Sources;
 
@@ -62,17 +64,18 @@ pub fn run() -> Result<()> {
 
     let sources = Sources::new(args.entry)?;
 
-    let bundler = Bundler {
+    let mut pipeline = Pipeline {
+        bundler: Bundler {},
+        banner: Banner {
+            quotes: Quotes {},
+            deterministic: args.deterministic,
+        },
         formatter: some_if(!args.no_format, || Formatter {
             exe: args.formatter,
         }),
-        deterministic: args.deterministic,
-        quotes: Quotes {},
     };
 
-    let bundle = bundler
-        .bundle(sources.dependency_order()?)
-        .context("failed to make bundle")?;
+    let bundle = pipeline.process(&sources)?;
 
     write_bundle(bundle, &args.output_file).with_context(|| {
         format!(

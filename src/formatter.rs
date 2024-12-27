@@ -1,17 +1,22 @@
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use std::str::from_utf8;
 
 use eyre::{bail, Context, Result};
+
+use crate::pipeline::Stage;
 
 #[derive(Debug, Clone)]
 pub struct Formatter {
     pub exe: PathBuf,
 }
 
-impl Formatter {
-    pub fn format(&self, code: String) -> Result<String> {
+impl Stage for Formatter {
+    fn name() -> &'static str {
+        "format"
+    }
+
+    fn process(&mut self, code: String) -> Result<String> {
         let mut p = Command::new(&self.exe)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -29,11 +34,9 @@ impl Formatter {
             bail!("formatter exited with non-zero code");
         }
 
-        let formatterd_code = from_utf8(&p.stdout)
-            .context("formatter stdout contains invalid UTF8")?
-            .trim()
-            .to_owned();
+        let formatted_code =
+            String::from_utf8(p.stdout).context("formatter stdout contains invalid UTF8")?;
 
-        Ok(formatterd_code)
+        Ok(formatted_code)
     }
 }
