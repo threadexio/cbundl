@@ -10,6 +10,7 @@ extern crate log;
 mod banner;
 mod bundler;
 mod cli;
+mod config;
 mod consts;
 mod display;
 mod formatter;

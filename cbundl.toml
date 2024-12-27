@@ -1,0 +1,3 @@
+no-format = true
+formatter = "/home/kat/.nix-profile/bin/clang-format"
+deterministic = true
