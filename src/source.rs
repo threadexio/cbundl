@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::iter::{Chain, FusedIterator};
 use std::path::{Path, PathBuf};
-use std::vec;
+use std::slice;
 
 use eyre::{bail, Context, Result};
 use petgraph::algo::toposort;
@@ -30,7 +30,7 @@ pub struct Source {
 #[derive(Debug, Clone)]
 pub struct Sources {
     graph: Graph,
-    entry: NodeIndex,
+    dependencies: Vec<NodeIndex>,
 }
 
 struct SourceGraphBuilder {
@@ -165,56 +165,60 @@ impl Sources {
         let entry = builder.add_source_file(entry, SourceKind::Implementation)?;
 
         let SourceGraphBuilder { graph, .. } = builder;
-        Ok(Self { graph, entry })
-    }
 
-    pub fn dependency_order(&self) -> Result<DependencyOrder<'_>> {
-        let mut order = match toposort(&self.graph, None) {
+        let mut dependencies = match toposort(&graph, None) {
             Ok(x) => x,
             Err(_) => bail!("found circular dependency in source files"),
         };
 
-        order.sort_by(|l, r| {
-            let a = &self.graph[*l];
-            let b = &self.graph[*r];
+        dependencies.sort_by(|l, r| {
+            let a = &graph[*l];
+            let b = &graph[*r];
 
             match (a.kind, b.kind) {
                 (SourceKind::Declaration, SourceKind::Implementation) => Ordering::Greater,
                 (SourceKind::Implementation, SourceKind::Declaration) => Ordering::Less,
-                (_, _) if *l == self.entry => Ordering::Greater,
-                (_, _) if *r == self.entry => Ordering::Less,
+                (_, _) if *l == entry => Ordering::Greater,
+                (_, _) if *r == entry => Ordering::Less,
                 _ => Ordering::Equal,
             }
         });
-        order.reverse();
+        dependencies.reverse();
 
-        Ok(DependencyOrder {
-            graph: &self.graph,
-            index_iter: order.into_iter(),
+        Ok(Self {
+            graph,
+            dependencies,
         })
+    }
+
+    pub fn dependency_order(&self) -> DependencyOrder<'_> {
+        DependencyOrder {
+            graph: &self.graph,
+            iter: self.dependencies.iter(),
+        }
     }
 }
 
 pub struct DependencyOrder<'a> {
     graph: &'a Graph,
-    index_iter: vec::IntoIter<NodeIndex>,
+    iter: slice::Iter<'a, NodeIndex>,
 }
 
 impl<'a> Iterator for DependencyOrder<'a> {
     type Item = &'a Source;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.index_iter.next().map(|idx| &self.graph[idx])
+        self.iter.next().map(|idx| &self.graph[*idx])
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        self.index_iter.size_hint()
+        self.iter.size_hint()
     }
 }
 
 impl ExactSizeIterator for DependencyOrder<'_> {
     fn len(&self) -> usize {
-        self.index_iter.len()
+        self.iter.len()
     }
 }
 

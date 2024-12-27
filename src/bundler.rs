@@ -8,11 +8,11 @@ use crate::source::Sources;
 pub struct Bundler {}
 
 impl Bundler {
-    pub fn bundle(&self, sources: &Sources) -> Result<String> {
+    pub fn bundle(&self, sources: &Sources) -> String {
         let mut out = String::new();
 
         sources
-            .dependency_order()?
+            .dependency_order()
             .try_for_each(|source| -> Result<()> {
                 let file_name = source
                     .path
@@ -35,6 +35,6 @@ impl Bundler {
             })
             .expect("writing to String should never fail");
 
-        Ok(out)
+        out
     }
 }

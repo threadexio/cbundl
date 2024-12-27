@@ -32,7 +32,7 @@ pub struct Pipeline {
 
 impl Pipeline {
     pub fn process(&mut self, sources: &Sources) -> Result<String> {
-        let mut out = self.bundler.bundle(sources)?;
+        let mut out = self.bundler.bundle(sources);
 
         out = run_stage(&mut self.banner, out)?;
         out = run_stage(&mut self.formatter, out)?;
