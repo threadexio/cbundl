@@ -319,7 +319,7 @@ If you want to install `cbundl` permanently, you can add the flake to your syste
 
 ### manually
 
-`cbundl` is a standalone binary. This means you can very easily install it only for your own user. The following will download the latest linux binary from [Releases][releases] into `~/.bin`.
+`cbundl` is a standalone binary. This means you can very easily install it only for your own user. The following will download the latest linux binary from [Releases][gh-releases] into `~/.bin`.
 
 ```bash
 $ mkdir -p ~/.bin
