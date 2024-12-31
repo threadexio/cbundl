@@ -123,6 +123,13 @@ pub struct Config {
     pub entry: PathBuf,
 }
 
+// I think that discrete `if-else` blocks show the different places a value can come from
+// better than using the functional-style combinators.
+#[allow(
+    clippy::manual_unwrap_or,
+    clippy::manual_unwrap_or_default,
+    clippy::manual_map
+)]
 impl Config {
     pub fn new() -> Result<Self> {
         let args = Args::command().get_matches();

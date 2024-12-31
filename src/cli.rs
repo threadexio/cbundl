@@ -25,7 +25,7 @@ pub fn run() -> Result<()> {
             quotes: Quotes {},
             deterministic: config.deterministic,
         },
-        formatter: (!config.no_format).then(|| Formatter {
+        formatter: (!config.no_format).then_some(Formatter {
             exe: config.formatter,
         }),
     };
@@ -36,7 +36,7 @@ pub fn run() -> Result<()> {
         if let Some(path) = config.output_file.as_ref() {
             format!("failed to write bundle to `{}`", display_path(path))
         } else {
-            format!("failed to write bundle to stdout")
+            "failed to write bundle to stdout".to_owned()
         }
     })?;
 
