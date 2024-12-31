@@ -1,3 +1,7 @@
-no-format = true
-formatter = "/home/kat/.nix-profile/bin/clang-format"
-deterministic = true
+[bundle]
+output = "test/frob/final.c"
+deterministic = false
+
+[formatter]
+# enable = true
+# path = "clang-format"

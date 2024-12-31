@@ -51,3 +51,6 @@ pub const LONG_VERSION: &str = const {
  ► with {RUSTC_VERSION}"
     )
 };
+
+pub const DEFAULT_FORMATTER: &str = "clang-format";
+pub const DEFAULT_CONFIG_FILES: &[&str] = &[".cbundl.toml", "cbundl.toml"];
