@@ -213,6 +213,7 @@ impl Config {
                 file.as_ref()
                     .and_then(|x| x.banner.as_ref())
                     .and_then(|x| x.enable)
+                    .map(|x| !x)
             })
             .unwrap_or(false);
 
