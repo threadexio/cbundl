@@ -19,7 +19,9 @@ pub fn run() -> Result<()> {
 
     let sources = Sources::new(config.entry)?;
 
-    let bundler = Bundler {};
+    let bundler = Bundler {
+        separators: config.bundle_separators,
+    };
 
     let quotes = config.enable_quote.then_some(Quotes {
         deterministic: config.deterministic,

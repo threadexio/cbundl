@@ -78,6 +78,7 @@ struct File {
 
 #[derive(Debug, Clone, Deserialize)]
 struct BundleSection {
+    separators: Option<bool>,
     deterministic: Option<bool>,
 
     #[serde(rename = "output")]
@@ -164,6 +165,7 @@ impl ArgMatchesExt for ArgMatches {
 
 #[derive(Debug, Clone)]
 pub struct Config {
+    pub bundle_separators: bool,
     pub deterministic: bool,
     pub output_file: Option<PathBuf>,
 
@@ -198,6 +200,12 @@ impl Config {
                 None => None,
             }
         };
+
+        let bundle_separators = file
+            .as_ref()
+            .and_then(|x| x.bundle.as_ref())
+            .and_then(|x| x.separators)
+            .unwrap_or(true);
 
         let deterministic = args
             .flag("deterministic")
@@ -273,6 +281,7 @@ impl Config {
         let entry = args.value::<PathBuf>("entry").unwrap().clone();
 
         Ok(Self {
+            bundle_separators,
             deterministic,
             output_file,
 

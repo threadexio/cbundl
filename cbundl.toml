@@ -1,6 +1,7 @@
 [bundle]
-output = "test/frob/final.c"
+separators = true
 deterministic = false
+output = "test/frob/final.c"
 
 [banner]
 enable = true

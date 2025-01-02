@@ -5,7 +5,9 @@ use eyre::Result;
 use crate::source::Sources;
 
 #[derive(Debug, Clone)]
-pub struct Bundler {}
+pub struct Bundler {
+    pub separators: bool,
+}
 
 impl Bundler {
     pub fn bundle(&self, sources: &Sources) -> String {
@@ -19,12 +21,14 @@ impl Bundler {
                     .file_name()
                     .expect("source file paths should always have a last component");
 
-                let header = format!("bundled from \"{}\"", file_name.to_string_lossy());
+                if self.separators {
+                    let header = format!("bundled from \"{}\"", file_name.to_string_lossy());
 
-                writeln!(out, "/**")?;
-                writeln!(out, " * {}", header)?;
-                writeln!(out, " */")?;
-                writeln!(out)?;
+                    writeln!(out, "/**")?;
+                    writeln!(out, " * {}", header)?;
+                    writeln!(out, " */")?;
+                    writeln!(out)?;
+                }
 
                 out.write_str(&source.content)?;
                 if !source.content.ends_with("\n\n") {
