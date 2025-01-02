@@ -11,6 +11,7 @@ use crate::consts::{
     CRATE_DESCRIPTION, DEFAULT_CONFIG_FILES, DEFAULT_FORMATTER, LONG_VERSION, SHORT_VERSION,
 };
 use crate::display::display_path;
+use crate::quotes::{CustomQuote, QuotePicker};
 
 #[derive(Debug, Clone, Parser)]
 #[command(
@@ -70,6 +71,9 @@ struct File {
     bundle: Option<BundleSection>,
     banner: Option<BannerSection>,
     formatter: Option<FormatterSection>,
+
+    #[serde(rename = "quote")]
+    quotes: Vec<CustomQuote>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -89,6 +93,9 @@ struct BannerSection {
 #[derive(Debug, Clone, Deserialize)]
 struct QuoteSection {
     enable: Option<bool>,
+
+    #[serde(rename = "pick")]
+    picker: Option<QuotePicker>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -109,22 +116,16 @@ impl File {
         Some(x)
     }
 
-    fn read_many<'a, I>(paths: I) -> Option<Self>
+    fn read_many<'a, I>(paths: I) -> Option<Result<Self>>
     where
         I: Iterator<Item = &'a Path>,
     {
         for path in paths {
             match Self::read(path) {
                 Some(r) => {
-                    match r
-                        .with_context(|| format!("failed to read config `{}`", display_path(path)))
-                    {
-                        Ok(x) => return Some(x),
-                        Err(e) => {
-                            warn!("{e:#}");
-                            continue;
-                        }
-                    }
+                    return Some(r.with_context(|| {
+                        format!("failed to read config `{}`", display_path(path))
+                    }))
                 }
                 None => continue,
             }
@@ -168,6 +169,8 @@ pub struct Config {
 
     pub no_banner: bool,
     pub enable_quote: bool,
+    pub quote_picker: QuotePicker,
+    pub custom_quotes: Vec<CustomQuote>,
 
     pub no_format: bool,
     pub formatter: PathBuf,
@@ -188,7 +191,12 @@ impl Config {
 
             Some(x)
         } else {
-            File::read_many(DEFAULT_CONFIG_FILES.iter().copied().map(Path::new))
+            let default_config_files = DEFAULT_CONFIG_FILES.iter().copied().map(Path::new);
+
+            match File::read_many(default_config_files) {
+                Some(x) => Some(x?),
+                None => None,
+            }
         };
 
         let deterministic = args
@@ -231,6 +239,16 @@ impl Config {
             .and_then(|x| x.enable)
             .unwrap_or(true);
 
+        let quote_picker = file
+            .as_ref()
+            .and_then(|x| x.banner.as_ref())
+            .and_then(|x| x.quote.as_ref())
+            .and_then(|x| x.picker.as_ref())
+            .cloned()
+            .unwrap_or(QuotePicker::All);
+
+        let custom_quotes = file.as_ref().map(|x| x.quotes.clone()).unwrap_or_default();
+
         let no_format = args
             .flag("no_format")
             .or_else(|| {
@@ -260,6 +278,8 @@ impl Config {
 
             no_banner,
             enable_quote,
+            quote_picker,
+            custom_quotes,
 
             no_format,
             formatter,

@@ -7,7 +7,19 @@ enable = true
 
 [banner.quote]
 enable = true
+pick = "custom"
 
 [formatter]
 # enable = true
 # path = "clang-format"
+
+[[quote]]
+text = """
+Use a gun. And if that don't work...
+                                      use more gun.
+"""
+author = "Dr. Dell Conagher"
+
+[[quote]]
+text = "Democracy prevails once more."
+author = "Democracy Officer"

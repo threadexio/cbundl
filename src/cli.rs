@@ -19,15 +19,27 @@ pub fn run() -> Result<()> {
 
     let sources = Sources::new(config.entry)?;
 
+    let bundler = Bundler {};
+
+    let quotes = config.enable_quote.then_some(Quotes {
+        deterministic: config.deterministic,
+        picker: config.quote_picker,
+        custom_quotes: config.custom_quotes,
+    });
+
+    let banner = (!config.no_banner).then_some(Banner {
+        deterministic: config.deterministic,
+        quotes,
+    });
+
+    let formatter = (!config.no_format).then_some(Formatter {
+        exe: config.formatter,
+    });
+
     let mut pipeline = Pipeline {
-        bundler: Bundler {},
-        banner: (!config.no_banner).then_some(Banner {
-            quotes: config.enable_quote.then_some(Quotes {}),
-            deterministic: config.deterministic,
-        }),
-        formatter: (!config.no_format).then_some(Formatter {
-            exe: config.formatter,
-        }),
+        bundler,
+        banner,
+        formatter,
     };
 
     let bundle = pipeline.process(&sources)?;

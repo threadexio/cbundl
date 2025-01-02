@@ -56,11 +56,7 @@ impl Banner {
         writeln!(out, " *")?;
 
         if let Some(quotes) = self.quotes.as_ref() {
-            let quote = if self.deterministic {
-                quotes.get(0).expect("we dont have a single quote :'(")
-            } else {
-                quotes.random()
-            };
+            let quote = quotes.random();
 
             writeln!(out, " *")?;
             quote.lines().try_for_each(|x| writeln!(out, " * {x}"))?;
