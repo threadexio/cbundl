@@ -5,6 +5,9 @@ deterministic = false
 [banner]
 enable = true
 
+[banner.quote]
+enable = true
+
 [formatter]
 # enable = true
 # path = "clang-format"

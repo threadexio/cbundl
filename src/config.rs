@@ -83,6 +83,12 @@ struct BundleSection {
 #[derive(Debug, Clone, Deserialize)]
 struct BannerSection {
     enable: Option<bool>,
+    quote: Option<QuoteSection>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct QuoteSection {
+    enable: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -161,6 +167,7 @@ pub struct Config {
     pub output_file: Option<PathBuf>,
 
     pub no_banner: bool,
+    pub enable_quote: bool,
 
     pub no_format: bool,
     pub formatter: PathBuf,
@@ -217,6 +224,13 @@ impl Config {
             })
             .unwrap_or(false);
 
+        let enable_quote = file
+            .as_ref()
+            .and_then(|x| x.banner.as_ref())
+            .and_then(|x| x.quote.as_ref())
+            .and_then(|x| x.enable)
+            .unwrap_or(true);
+
         let no_format = args
             .flag("no_format")
             .or_else(|| {
@@ -245,6 +259,7 @@ impl Config {
             output_file,
 
             no_banner,
+            enable_quote,
 
             no_format,
             formatter,

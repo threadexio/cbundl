@@ -22,7 +22,7 @@ pub fn run() -> Result<()> {
     let mut pipeline = Pipeline {
         bundler: Bundler {},
         banner: (!config.no_banner).then_some(Banner {
-            quotes: Quotes {},
+            quotes: config.enable_quote.then_some(Quotes {}),
             deterministic: config.deterministic,
         }),
         formatter: (!config.no_format).then_some(Formatter {
