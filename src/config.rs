@@ -3,7 +3,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use clap::parser::ValueSource;
-use clap::{CommandFactory, Parser};
+use clap::{ArgMatches, CommandFactory, Parser};
 use eyre::{Context, Result};
 use serde::Deserialize;
 
@@ -26,7 +26,12 @@ struct Args {
     )]
     no_config: bool,
 
-    #[arg(long, help = "Specify an alternate configuration file")]
+    #[arg(
+        long,
+        help = "Specify an alternate configuration file.",
+        value_name = "path",
+        default_values = DEFAULT_CONFIG_FILES
+    )]
     config: Option<PathBuf>,
 
     #[arg(long, help = "Don't pass the resulting bundle through the formatter.")]
@@ -123,81 +128,77 @@ pub struct Config {
     pub entry: PathBuf,
 }
 
-// I think that discrete `if-else` blocks show the different places a value can come from
-// better than using the functional-style combinators.
-#[allow(
-    clippy::manual_unwrap_or,
-    clippy::manual_unwrap_or_default,
-    clippy::manual_map
-)]
 impl Config {
     pub fn new() -> Result<Self> {
+        fn arg<'a, T>(args: &'a ArgMatches, id: &str) -> Option<&'a T>
+        where
+            T: Clone + Send + Sync + 'static,
+        {
+            match args.value_source(id)? {
+                ValueSource::DefaultValue => None,
+                _ => Some(args.get_one::<T>(id).unwrap()),
+            }
+        }
+
+        fn arg_flag(args: &ArgMatches, id: &str) -> Option<bool> {
+            match args.value_source(id).unwrap() {
+                ValueSource::DefaultValue => None,
+                _ => Some(args.get_flag(id)),
+            }
+        }
+
         let args = Args::command().get_matches();
 
-        let file = if args.get_flag("no_config") {
+        let file = if arg_flag(&args, "no_config").unwrap_or(false) {
             None
-        } else if let Some(config) = args.get_one::<&PathBuf>("config") {
-            let x = File::read(config)
+        } else if let Some(path) = arg::<PathBuf>(&args, "config") {
+            let x = File::read(path)
                 .ok_or_else(|| io::Error::from(io::ErrorKind::NotFound))
-                .with_context(|| format!("failed to read config `{}`", display_path(config)))??;
+                .with_context(|| format!("failed to read config `{}`", display_path(path)))??;
 
             Some(x)
         } else {
             File::read_many(DEFAULT_CONFIG_FILES.iter().copied().map(Path::new))
         };
 
-        let no_format = if let ValueSource::CommandLine = args.value_source("no_format").unwrap() {
-            args.get_flag("no_format")
-        } else if let Some(x) = file
-            .as_ref()
-            .and_then(|x| x.formatter.as_ref())
-            .and_then(|x| x.enable)
-        {
-            !x
-        } else {
-            false
-        };
+        let no_format = arg_flag(&args, "no_format")
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.formatter.as_ref())
+                    .and_then(|x| x.enable)
+                    .map(|x| !x)
+            })
+            .unwrap_or(false);
 
-        let formatter = if let ValueSource::CommandLine = args.value_source("formatter").unwrap() {
-            args.get_one::<PathBuf>("formatter").unwrap().clone()
-        } else if let Some(x) = file
-            .as_ref()
-            .and_then(|x| x.formatter.as_ref())
-            .and_then(|x| x.path.as_ref())
-        {
-            x.clone()
-        } else {
-            PathBuf::from(DEFAULT_FORMATTER)
-        };
+        let formatter = arg::<PathBuf>(&args, "formatter")
+            .cloned()
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.formatter.as_ref())
+                    .and_then(|x| x.path.as_ref())
+                    .cloned()
+            })
+            .unwrap_or_else(|| PathBuf::from(DEFAULT_FORMATTER));
 
-        let deterministic =
-            if let ValueSource::CommandLine = args.value_source("deterministic").unwrap() {
-                args.get_flag("deterministic")
-            } else if let Some(x) = file
-                .as_ref()
-                .and_then(|x| x.bundle.as_ref())
-                .and_then(|x| x.deterministic)
-            {
-                x
-            } else {
-                false
-            };
+        let deterministic = arg_flag(&args, "deterministic")
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.bundle.as_ref())
+                    .and_then(|x| x.deterministic)
+            })
+            .unwrap_or(false);
 
-        let output_file =
-            if let ValueSource::CommandLine = args.value_source("output_file").unwrap() {
-                let x = args.get_one::<PathBuf>("output_file").unwrap();
-                (!path_is_stdio(x)).then(|| x.clone())
-            } else if let Some(x) = file
-                .as_ref()
-                .and_then(|x| x.bundle.as_ref())
-                .and_then(|x| x.output_file.as_ref())
-            {
-                Some(x.to_owned())
-            } else {
-                None
-            };
+        let output_file = arg::<PathBuf>(&args, "output_file")
+            .and_then(path_not_stdio)
+            .cloned()
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.bundle.as_ref())
+                    .and_then(|x| x.output_file.as_ref())
+                    .cloned()
+            });
 
-        let entry = args.get_one::<PathBuf>("entry").unwrap().clone();
+        let entry = arg::<PathBuf>(&args, "entry").unwrap().clone();
 
         Ok(Self {
             no_format,
@@ -206,6 +207,14 @@ impl Config {
             output_file,
             entry,
         })
+    }
+}
+
+fn path_not_stdio(path: &PathBuf) -> Option<&PathBuf> {
+    if path_is_stdio(path) {
+        None
+    } else {
+        Some(path)
     }
 }
 
