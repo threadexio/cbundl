@@ -203,14 +203,17 @@ impl Config {
 
         let output_file = args
             .value::<PathBuf>("output_file")
-            .and_then(path_not_stdio)
-            .cloned()
+            .map(|x| path_not_stdio(x).cloned())
             .or_else(|| {
-                file.as_ref()
+                let x = file
+                    .as_ref()
                     .and_then(|x| x.bundle.as_ref())
                     .and_then(|x| x.output_file.as_ref())
-                    .cloned()
-            });
+                    .cloned();
+
+                Some(x)
+            })
+            .unwrap_or(None);
 
         let entry = args.value::<PathBuf>("entry").unwrap().clone();
 
