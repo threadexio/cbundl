@@ -2,6 +2,9 @@
 output = "test/frob/final.c"
 deterministic = false
 
+[banner]
+enable = true
+
 [formatter]
 # enable = true
 # path = "clang-format"

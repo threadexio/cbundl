@@ -34,18 +34,6 @@ struct Args {
     )]
     config: Option<PathBuf>,
 
-    #[arg(long, help = "Don't pass the resulting bundle through the formatter.")]
-    no_format: bool,
-
-    #[arg(
-        long,
-        help = "Code formatter executable.",
-        long_help = "Code formatter. Must format the code from stdin and write it to stdout.",
-        value_name = "exe",
-        default_value = DEFAULT_FORMATTER
-    )]
-    formatter: PathBuf,
-
     #[arg(long = "deterministic", help = "Output a deterministic bundle.")]
     deterministic: bool,
 
@@ -58,6 +46,21 @@ struct Args {
     )]
     output_file: PathBuf,
 
+    #[arg(long, help = "Don't output the banner at the top of the bundle.")]
+    no_banner: bool,
+
+    #[arg(long, help = "Don't pass the resulting bundle through the formatter.")]
+    no_format: bool,
+
+    #[arg(
+        long,
+        help = "Code formatter executable.",
+        long_help = "Code formatter. Must format the code from stdin and write it to stdout.",
+        value_name = "exe",
+        default_value = DEFAULT_FORMATTER
+    )]
+    formatter: PathBuf,
+
     #[arg(help = "Path to the entry source file.", value_name = "path")]
     entry: PathBuf,
 }
@@ -65,6 +68,7 @@ struct Args {
 #[derive(Debug, Clone, Deserialize)]
 struct File {
     bundle: Option<BundleSection>,
+    banner: Option<BannerSection>,
     formatter: Option<FormatterSection>,
 }
 
@@ -74,6 +78,11 @@ struct BundleSection {
 
     #[serde(rename = "output")]
     output_file: Option<PathBuf>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct BannerSection {
+    enable: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -148,10 +157,14 @@ impl ArgMatchesExt for ArgMatches {
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub no_format: bool,
-    pub formatter: PathBuf,
     pub deterministic: bool,
     pub output_file: Option<PathBuf>,
+
+    pub no_banner: bool,
+
+    pub no_format: bool,
+    pub formatter: PathBuf,
+
     pub entry: PathBuf,
 }
 
@@ -170,27 +183,6 @@ impl Config {
         } else {
             File::read_many(DEFAULT_CONFIG_FILES.iter().copied().map(Path::new))
         };
-
-        let no_format = args
-            .flag("no_format")
-            .or_else(|| {
-                file.as_ref()
-                    .and_then(|x| x.formatter.as_ref())
-                    .and_then(|x| x.enable)
-                    .map(|x| !x)
-            })
-            .unwrap_or(false);
-
-        let formatter = args
-            .value::<PathBuf>("formatter")
-            .cloned()
-            .or_else(|| {
-                file.as_ref()
-                    .and_then(|x| x.formatter.as_ref())
-                    .and_then(|x| x.path.as_ref())
-                    .cloned()
-            })
-            .unwrap_or_else(|| PathBuf::from(DEFAULT_FORMATTER));
 
         let deterministic = args
             .flag("deterministic")
@@ -215,13 +207,47 @@ impl Config {
             })
             .unwrap_or(None);
 
+        let no_banner = args
+            .flag("no_banner")
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.banner.as_ref())
+                    .and_then(|x| x.enable)
+            })
+            .unwrap_or(false);
+
+        let no_format = args
+            .flag("no_format")
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.formatter.as_ref())
+                    .and_then(|x| x.enable)
+                    .map(|x| !x)
+            })
+            .unwrap_or(false);
+
+        let formatter = args
+            .value::<PathBuf>("formatter")
+            .cloned()
+            .or_else(|| {
+                file.as_ref()
+                    .and_then(|x| x.formatter.as_ref())
+                    .and_then(|x| x.path.as_ref())
+                    .cloned()
+            })
+            .unwrap_or_else(|| PathBuf::from(DEFAULT_FORMATTER));
+
         let entry = args.value::<PathBuf>("entry").unwrap().clone();
 
         Ok(Self {
-            no_format,
-            formatter,
             deterministic,
             output_file,
+
+            no_banner,
+
+            no_format,
+            formatter,
+
             entry,
         })
     }

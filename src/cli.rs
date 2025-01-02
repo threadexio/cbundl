@@ -21,10 +21,10 @@ pub fn run() -> Result<()> {
 
     let mut pipeline = Pipeline {
         bundler: Bundler {},
-        banner: Banner {
+        banner: (!config.no_banner).then_some(Banner {
             quotes: Quotes {},
             deterministic: config.deterministic,
-        },
+        }),
         formatter: (!config.no_format).then_some(Formatter {
             exe: config.formatter,
         }),

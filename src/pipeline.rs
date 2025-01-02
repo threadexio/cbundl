@@ -26,7 +26,7 @@ impl<S: Stage> Stage for Option<S> {
 #[derive(Debug, Clone)]
 pub struct Pipeline {
     pub bundler: Bundler,
-    pub banner: Banner,
+    pub banner: Option<Banner>,
     pub formatter: Option<Formatter>,
 }
 
