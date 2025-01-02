@@ -119,6 +119,33 @@ impl File {
     }
 }
 
+trait ArgMatchesExt: Sized {
+    fn value<'a, T>(&'a self, id: &str) -> Option<&'a T>
+    where
+        T: Clone + Send + Sync + 'static;
+
+    fn flag(&self, id: &str) -> Option<bool>;
+}
+
+impl ArgMatchesExt for ArgMatches {
+    fn value<'a, T>(&'a self, id: &str) -> Option<&'a T>
+    where
+        T: Clone + Send + Sync + 'static,
+    {
+        match self.value_source(id)? {
+            ValueSource::DefaultValue => None,
+            _ => Some(self.get_one::<T>(id).unwrap()),
+        }
+    }
+
+    fn flag(&self, id: &str) -> Option<bool> {
+        match self.value_source(id).unwrap() {
+            ValueSource::DefaultValue => None,
+            _ => Some(self.get_flag(id)),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Config {
     pub no_format: bool,
@@ -130,28 +157,11 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Self> {
-        fn arg<'a, T>(args: &'a ArgMatches, id: &str) -> Option<&'a T>
-        where
-            T: Clone + Send + Sync + 'static,
-        {
-            match args.value_source(id)? {
-                ValueSource::DefaultValue => None,
-                _ => Some(args.get_one::<T>(id).unwrap()),
-            }
-        }
-
-        fn arg_flag(args: &ArgMatches, id: &str) -> Option<bool> {
-            match args.value_source(id).unwrap() {
-                ValueSource::DefaultValue => None,
-                _ => Some(args.get_flag(id)),
-            }
-        }
-
         let args = Args::command().get_matches();
 
-        let file = if arg_flag(&args, "no_config").unwrap_or(false) {
+        let file = if args.flag("no_config").unwrap_or(false) {
             None
-        } else if let Some(path) = arg::<PathBuf>(&args, "config") {
+        } else if let Some(path) = args.value::<PathBuf>("config") {
             let x = File::read(path)
                 .ok_or_else(|| io::Error::from(io::ErrorKind::NotFound))
                 .with_context(|| format!("failed to read config `{}`", display_path(path)))??;
@@ -161,7 +171,8 @@ impl Config {
             File::read_many(DEFAULT_CONFIG_FILES.iter().copied().map(Path::new))
         };
 
-        let no_format = arg_flag(&args, "no_format")
+        let no_format = args
+            .flag("no_format")
             .or_else(|| {
                 file.as_ref()
                     .and_then(|x| x.formatter.as_ref())
@@ -170,7 +181,8 @@ impl Config {
             })
             .unwrap_or(false);
 
-        let formatter = arg::<PathBuf>(&args, "formatter")
+        let formatter = args
+            .value::<PathBuf>("formatter")
             .cloned()
             .or_else(|| {
                 file.as_ref()
@@ -180,7 +192,8 @@ impl Config {
             })
             .unwrap_or_else(|| PathBuf::from(DEFAULT_FORMATTER));
 
-        let deterministic = arg_flag(&args, "deterministic")
+        let deterministic = args
+            .flag("deterministic")
             .or_else(|| {
                 file.as_ref()
                     .and_then(|x| x.bundle.as_ref())
@@ -188,7 +201,8 @@ impl Config {
             })
             .unwrap_or(false);
 
-        let output_file = arg::<PathBuf>(&args, "output_file")
+        let output_file = args
+            .value::<PathBuf>("output_file")
             .and_then(path_not_stdio)
             .cloned()
             .or_else(|| {
@@ -198,7 +212,7 @@ impl Config {
                     .cloned()
             });
 
-        let entry = arg::<PathBuf>(&args, "entry").unwrap().clone();
+        let entry = args.value::<PathBuf>("entry").unwrap().clone();
 
         Ok(Self {
             no_format,
