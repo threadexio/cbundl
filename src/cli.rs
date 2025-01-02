@@ -36,6 +36,7 @@ pub fn run() -> Result<()> {
 
     let formatter = (!config.no_format).then_some(Formatter {
         exe: config.formatter,
+        args: config.formatter_args,
     });
 
     let mut pipeline = Pipeline {

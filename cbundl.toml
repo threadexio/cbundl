@@ -11,8 +11,9 @@ enable = true
 pick = "custom"
 
 [formatter]
-# enable = true
-# path = "clang-format"
+enable = true
+path = "clang-format"
+args = ["--verbose", "--sort-includes"]
 
 [[quote]]
 text = """

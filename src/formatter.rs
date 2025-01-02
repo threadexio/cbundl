@@ -4,11 +4,13 @@ use std::process::{Command, Stdio};
 
 use eyre::{bail, Context, Result};
 
+use crate::display::display_path;
 use crate::pipeline::Stage;
 
 #[derive(Debug, Clone)]
 pub struct Formatter {
     pub exe: PathBuf,
+    pub args: Vec<String>,
 }
 
 impl Stage for Formatter {
@@ -18,15 +20,18 @@ impl Stage for Formatter {
 
     fn process(&mut self, code: String) -> Result<String> {
         let mut p = Command::new(&self.exe)
+            .args(&self.args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
-            .spawn()?;
+            .spawn()
+            .with_context(|| format!("failed to run formatter `{}`", display_path(&self.exe)))?;
 
         p.stdin
             .as_mut()
             .expect("stdin was captured but was also None")
-            .write_all(code.as_bytes())?;
+            .write_all(code.as_bytes())
+            .context("failed to write bundle to formatter's stdin")?;
 
         let p = p.wait_with_output()?;
 

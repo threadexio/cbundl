@@ -103,6 +103,7 @@ struct QuoteSection {
 struct FormatterSection {
     enable: Option<bool>,
     path: Option<PathBuf>,
+    args: Option<Vec<String>>,
 }
 
 impl File {
@@ -176,6 +177,7 @@ pub struct Config {
 
     pub no_format: bool,
     pub formatter: PathBuf,
+    pub formatter_args: Vec<String>,
 
     pub entry: PathBuf,
 }
@@ -278,6 +280,12 @@ impl Config {
             })
             .unwrap_or_else(|| PathBuf::from(DEFAULT_FORMATTER));
 
+        let formatter_args = file
+            .as_ref()
+            .and_then(|x| x.formatter.as_ref())
+            .and_then(|x| x.args.clone())
+            .unwrap_or_default();
+
         let entry = args.value::<PathBuf>("entry").unwrap().clone();
 
         Ok(Self {
@@ -292,6 +300,7 @@ impl Config {
 
             no_format,
             formatter,
+            formatter_args,
 
             entry,
         })
