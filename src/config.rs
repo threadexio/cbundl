@@ -198,7 +198,10 @@ impl ArgMatchesExt for ArgMatches {
     fn flag(&self, id: &str) -> Option<bool> {
         match self.value_source(id).unwrap() {
             ValueSource::DefaultValue => None,
-            _ => Some(self.get_one::<BooleanFlag>(id).unwrap().clone().into()),
+            _ => {
+                let x = *self.get_one::<BooleanFlag>(id).unwrap();
+                Some(x.into())
+            }
         }
     }
 }
