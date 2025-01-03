@@ -3,7 +3,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use clap::parser::ValueSource;
-use clap::{ArgMatches, CommandFactory, Parser};
+use clap::{ArgMatches, CommandFactory, Parser, ValueEnum};
 use eyre::{Context, Result};
 use serde::Deserialize;
 
@@ -12,6 +12,18 @@ use crate::consts::{
 };
 use crate::display::display_path;
 use crate::quotes::{CustomQuote, QuotePicker};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+enum BooleanFlag {
+    Yes,
+    No,
+}
+
+impl From<BooleanFlag> for bool {
+    fn from(x: BooleanFlag) -> Self {
+        x == BooleanFlag::Yes
+    }
+}
 
 #[derive(Debug, Clone, Parser)]
 #[command(
@@ -35,8 +47,17 @@ struct Args {
     )]
     config: Option<PathBuf>,
 
-    #[arg(long = "deterministic", help = "Output a deterministic bundle.")]
-    deterministic: bool,
+    #[arg(
+        long = "deterministic",
+        help = "Output a deterministic bundle.",
+        default_value = "no",
+        value_name = "boolean",
+        num_args = 0..=1,
+        require_equals = true,
+        default_missing_value = "yes",
+        hide_default_value = true,
+    )]
+    deterministic: BooleanFlag,
 
     #[arg(
         short = 'o',
@@ -47,11 +68,29 @@ struct Args {
     )]
     output_file: PathBuf,
 
-    #[arg(long, help = "Don't output the banner at the top of the bundle.")]
-    no_banner: bool,
+    #[arg(
+        long,
+        help = "Don't output the banner at the top of the bundle.",
+        default_value = "no",
+        value_name = "boolean",
+        num_args = 0..=1,
+        require_equals = true,
+        default_missing_value = "yes",
+        hide_default_value = true,
+    )]
+    no_banner: BooleanFlag,
 
-    #[arg(long, help = "Don't pass the resulting bundle through the formatter.")]
-    no_format: bool,
+    #[arg(
+        long,
+        help = "Don't pass the resulting bundle through the formatter.",
+        default_value = "no",
+        value_name = "boolean",
+        num_args = 0..=1,
+        require_equals = true,
+        default_missing_value = "yes",
+        hide_default_value = true,
+    )]
+    no_format: BooleanFlag,
 
     #[arg(
         long,
@@ -159,7 +198,7 @@ impl ArgMatchesExt for ArgMatches {
     fn flag(&self, id: &str) -> Option<bool> {
         match self.value_source(id).unwrap() {
             ValueSource::DefaultValue => None,
-            _ => Some(self.get_flag(id)),
+            _ => Some(self.get_one::<BooleanFlag>(id).unwrap().clone().into()),
         }
     }
 }
@@ -186,7 +225,7 @@ impl Config {
     pub fn new() -> Result<Self> {
         let args = Args::command().get_matches();
 
-        let file = if args.flag("no_config").unwrap_or(false) {
+        let file = if args.get_flag("no_config") {
             None
         } else if let Some(path) = args.value::<PathBuf>("config") {
             let x = File::read(path)
