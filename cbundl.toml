@@ -8,7 +8,7 @@ separators = true
 # will always be the same. This switch is useful if you intend to check into
 # source control the bundle, where you wouldn't want to pollute diffs with
 # changed to the generated date, or the quotes inside the bundle.
-deterministic = false
+deterministic = true
 
 # Write the final bundle to this path.
 output = "test/frob/final.c"

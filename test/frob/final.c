@@ -1,3 +1,5 @@
+// My amazing header text!
+
 /**
  *
  *                        )                (    (
@@ -8,14 +10,15 @@
  *              / _| | '_ \| || || ' \))/ _` || |
  *              \__| |_.__/ \_,_||_||_| \__,_||_|
  *
- *                cbundl 0.1.2-debug (21b24e9+)
+ *                cbundl 0.1.2-debug (c38dfd5+)
  *             https://github.com/threadexio/cbundl
  *
- *      Generated at: Tue 31 Dec 2024 21:44:31 (UTC+02:00)
+ *      Generated at: Thu 01 Jan 1970 00:00:00 (UTC+00:00)
  *
  *
- * Every evening I died, and every evening I was born again, resurrected.
- *   - Fight Club
+ * Use a gun. And if that don't work...
+ *                                       use more gun.
+ *   - Dr. Dell Conagher
  *
  */
 

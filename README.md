@@ -133,6 +133,8 @@ $ cbundl main.c -o final.c
 The above command will parse `main.c` and figure out what dependencies it has. In this example, `main.c` wants `stdio.h` and `frob.h`. Notice the comment above the `#include "frob.h"`. Comments that begin with `// cbundl:` are called "directives" and give special instructions to `cbundl`. The directive above `frob.h` tells `cbundl` that, to build the final bundle, it needs to include `frob.h`. The directive at the end of `frob.h` tells `cbundl` that the implementation for at least one of the symbols declared by `frob.h` lives in `frob.c`. This tells `cbundl` to include `frob.c` inside the resulting bundle. That's it. That's the entire tool :clap:. The file `final.c` then contains:
 
 ```c
+// My amazing header text!
+
 /**
  *
  *                        )                (    (
@@ -149,8 +151,9 @@ The above command will parse `main.c` and figure out what dependencies it has. I
  *      Generated at: XXX XX XXX XXX XX:XX:XX (UTC+XX:XX)
  *
  *
- * Time is an illusion. Lunchtime doubly so.
- *   - The Hitchhiker's Guide to the Galaxy
+ * Use a gun. And if that don't work...
+ *                                       use more gun.
+ *   - Dr. Dell Conagher
  *
  */
 
@@ -190,12 +193,14 @@ int main() {
 
 #include <stdio.h>
 
-static void update_frob_count(int* frob_count) { *frob_count += 1; }
+static void update_frob_count(int* frob_count) {
+  *frob_count += 1;
+}
 
 void frobinate(struct frobinator* frob) {
   printf("frobbed!\n");
   update_frob_count(&frob->frob_count);
-}  
+}
 ```
 
 The compiler is now happy to make us our binary. :smiley: Congratulations, you now know everything about this tool. :clap: And because we were good programmer boys, girls and everything in between, `cbundl` will also pass the resulting bundle code through a code formatter of our choice (`clang-format` by default) so its nice and pretty.
