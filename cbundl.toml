@@ -1,32 +1,85 @@
 [bundle]
+# Add separators between the contents of each source file inside the bundle.
 separators = true
+
+# Produce a deterministic bundle. This switch makes cbundl a pure function.
+# This means that for the same source files, the same bundle is always produced.
+# One sideffect is that dates will be displayed as the UNIX epoch and quotes
+# will always be the same. This switch is useful if you intend to check into
+# source control the bundle, where you wouldn't want to pollute diffs with
+# changed to the generated date, or the quotes inside the bundle.
 deterministic = false
+
+# Write the final bundle to this path.
 output = "test/frob/final.c"
 
+##
+## This section configures a custom header to be added to the very top of the
+## bundle. Useful for adding license text or copyright notices.
+##
 [header]
+# Whether to add the custom header.
 enable = true
+
+# The text to be added. Before you ask: yes, you can inject code from here but
+# you shouldn't have to. If you find yourself doing that, you are doing something
+# wrong.
 text = """
 // My amazing header text!
 """
+
+# Specify a file which contains the text for the header. The contents of the file
+# will be pasted in verbatim. This means that the file must contain the text in
+# C comments.
 #source = "header.txt"
 
+# NOTE: `text` and `source` cannot be specified both at the same time.
+
+##
+## This section configures the banner at the top of the bundle.
+##
 [banner]
+# Whether to add the banner.
 enable = true
 
+##
+## This section configures the quotes displayed inside the banner.
+##
 [banner.quote]
+# Whether to add quotes inside the banner.
 enable = true
+
+# Pick quotes from this location. Specifying "all" here will allow cbundl to
+# choose at random one quote without restrictions. "builtin" will only pick
+# quotes that are built-in to cbundl. "custom" will only pick quotes that are
+# configured here.
+#
+# Valid values: "all", "builtin", "custom"
 pick = "custom"
 
+##
+## This section configures how cbundl will format the bundle.
+##
 [formatter]
+# Whether to format the bundle.
 enable = true
+
+# Path to the formatter binary. Specifying just the executable will make cbundl
+# search in PATH for it.
 path = "clang-format"
+
+# Extra arguments to pass to the formatter.
 args = ["--verbose", "--sort-includes"]
 
+
+# A custom quote.
 [[quote]]
+# Quote text. Will appear as is.
 text = """
 Use a gun. And if that don't work...
                                       use more gun.
 """
+# Quote author. Make sure to give proper credit.
 author = "Dr. Dell Conagher"
 
 [[quote]]

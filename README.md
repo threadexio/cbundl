@@ -37,6 +37,7 @@ A simple tool that makes self-contained abominations of C code called bundles. I
   * [Directives](#directives)
     * [bundle](#bundle)
     * [impl](#impl)
+  * [Configuration](#configuration)
   * [Workflow](#workflow)
 * [Installation](#installation)
   * [cargo](#cargo)
@@ -210,21 +211,38 @@ Arguments:
           Path to the entry source file.
 
 Options:
-      --no-format
-          Don't pass the resulting bundle through the formatter.
+      --no-config
+          Don't load any configuration file. (Overrides `--config`)
 
-      --formatter <exe>
-          Code formatter. Must format the code from stdin and write it to stdout.
+      --config <path>
+          Specify an alternate configuration file.
 
-          [default: clang-format]
+          [default: .cbundl.toml cbundl.toml]
 
-      --deterministic
+      --deterministic[=<boolean>]
           Output a deterministic bundle.
+
+          [possible values: yes, no]
 
   -o, --output <path>
           Specify where to write the resulting bundle.
 
           [default: -]
+
+      --no-banner[=<boolean>]
+          Don't output the banner at the top of the bundle.
+
+          [possible values: yes, no]
+
+      --no-format[=<boolean>]
+          Don't pass the resulting bundle through the formatter.
+
+          [possible values: yes, no]
+
+      --formatter <exe>
+          Code formatter. Must format the code from stdin and write it to stdout.
+
+          [default: clang-format]
 
   -h, --help
           Print help (see a summary with '-h')
@@ -261,6 +279,15 @@ The bundle directive must always appear exactly above a local `#include`, withou
 **Format:** `// cbundl: impl=<path>`
 
 The `impl` directive, also called an implementation directive, informs `cbundl` that the current file is implemented by the file specified by `<path>`. This directive can appear any number of times in the file (if the implementation is split across many other files). It can also appear anywhere in the file, but convention is that `impl` directives appear only at either the start or the end of the file. Just like `#include`-ing `.c` files, using an implementation directive that points to a `.h` file is generally considered bad practice.
+
+### Configuration
+
+`cbundl` can be configured via a configuration file. The configuration file exposes fine-grained settings for `cbundl` not available through the command line. By default, `cbundl` looks for configuration files named `.cbundl.toml` or `cbundl.toml` (in that order), though a custom configuration file can be specified via `--config`. Alternatively, `--no-config` tells `cbundl` to ignore any configuration files.
+
+> [!NOTE]
+> Command line flags always take priority over the configuration file.
+
+Configuration files for `cbundl` are written in [TOML](https://toml.io/en). An example configuration is given in [`cbundl.toml`](./cbundl.toml).
 
 ### Workflow
 
