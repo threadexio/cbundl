@@ -3,6 +3,7 @@ use eyre::{Context, Result};
 use crate::banner::Banner;
 use crate::bundler::Bundler;
 use crate::formatter::Formatter;
+use crate::header::Header;
 use crate::source::Sources;
 
 pub trait Stage: Sized {
@@ -26,6 +27,7 @@ impl<S: Stage> Stage for Option<S> {
 #[derive(Debug, Clone)]
 pub struct Pipeline {
     pub bundler: Bundler,
+    pub header: Option<Header>,
     pub banner: Option<Banner>,
     pub formatter: Option<Formatter>,
 }
@@ -35,6 +37,7 @@ impl Pipeline {
         let mut out = self.bundler.bundle(sources);
 
         out = run_stage(&mut self.banner, out)?;
+        out = run_stage(&mut self.header, out)?;
         out = run_stage(&mut self.formatter, out)?;
 
         Ok(out)

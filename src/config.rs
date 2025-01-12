@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use clap::parser::ValueSource;
 use clap::{ArgMatches, CommandFactory, Parser, ValueEnum};
+use eyre::bail;
 use eyre::{Context, Result};
 use serde::Deserialize;
 
@@ -11,6 +12,7 @@ use crate::consts::{
     CRATE_DESCRIPTION, DEFAULT_CONFIG_FILES, DEFAULT_FORMATTER, LONG_VERSION, SHORT_VERSION,
 };
 use crate::display::display_path;
+use crate::header::HeaderSource;
 use crate::quotes::{CustomQuote, QuotePicker};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
@@ -108,6 +110,7 @@ struct Args {
 #[derive(Debug, Clone, Deserialize)]
 struct File {
     bundle: Option<BundleSection>,
+    header: Option<HeaderSection>,
     banner: Option<BannerSection>,
     formatter: Option<FormatterSection>,
 
@@ -122,6 +125,13 @@ struct BundleSection {
 
     #[serde(rename = "output")]
     output_file: Option<PathBuf>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct HeaderSection {
+    enable: Option<bool>,
+    text: Option<String>,
+    source: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -212,6 +222,8 @@ pub struct Config {
     pub deterministic: bool,
     pub output_file: Option<PathBuf>,
 
+    pub header_source: Option<HeaderSource>,
+
     pub no_banner: bool,
     pub enable_quote: bool,
     pub quote_picker: QuotePicker,
@@ -274,6 +286,26 @@ impl Config {
             })
             .unwrap_or(None);
 
+        let header_source = file
+            .as_ref()
+            .and_then(|x| x.header.as_ref())
+            .map_or(Ok(None), |x| {
+                if !x.enable.unwrap_or(false) {
+                    return Ok(None);
+                }
+
+                match (x.text.as_ref(), x.source.as_ref()) {
+                    (Some(x), None) => Ok(Some(HeaderSource::Text(x.clone()))),
+                    (None, Some(x)) => Ok(Some(HeaderSource::File(x.clone()))),
+                    (Some(_), Some(_)) => {
+                        bail!("both `text` and `source` were specified")
+                    }
+                    (None, None) => {
+                        bail!("bundle header needs at least one of `text` or `source` to be specified")
+                    }
+                }
+            })?;
+
         let no_banner = args
             .flag("no_banner")
             .or_else(|| {
@@ -334,6 +366,8 @@ impl Config {
             bundle_separators,
             deterministic,
             output_file,
+
+            header_source,
 
             no_banner,
             enable_quote,

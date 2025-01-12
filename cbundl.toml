@@ -3,6 +3,13 @@ separators = true
 deterministic = false
 output = "test/frob/final.c"
 
+[header]
+enable = true
+text = """
+// My amazing header text!
+"""
+#source = "header.txt"
+
 [banner]
 enable = true
 

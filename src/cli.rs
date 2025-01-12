@@ -9,6 +9,7 @@ use crate::bundler::Bundler;
 use crate::config::Config;
 use crate::display::display_path;
 use crate::formatter::Formatter;
+use crate::header::Header;
 use crate::pipeline::Pipeline;
 use crate::quotes::Quotes;
 use crate::source::Sources;
@@ -22,6 +23,8 @@ pub fn run() -> Result<()> {
     let bundler = Bundler {
         separators: config.bundle_separators,
     };
+
+    let header = config.header_source.map(|source| Header { source });
 
     let quotes = config.enable_quote.then_some(Quotes {
         deterministic: config.deterministic,
@@ -41,6 +44,7 @@ pub fn run() -> Result<()> {
 
     let mut pipeline = Pipeline {
         bundler,
+        header,
         banner,
         formatter,
     };

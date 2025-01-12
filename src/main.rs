@@ -14,6 +14,7 @@ mod config;
 mod consts;
 mod display;
 mod formatter;
+mod header;
 mod parse;
 mod pipeline;
 mod quotes;
