@@ -1,6 +1,6 @@
 [package]
 name = "cbundl"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["threadexio"]
 edition = "2021"
 description = "webpack but for C code."
