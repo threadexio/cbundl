@@ -115,7 +115,7 @@ struct File {
     formatter: Option<FormatterSection>,
 
     #[serde(rename = "quote")]
-    quotes: Vec<CustomQuote>,
+    quotes: Option<Vec<CustomQuote>>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -331,7 +331,10 @@ impl Config {
             .cloned()
             .unwrap_or(QuotePicker::All);
 
-        let custom_quotes = file.as_ref().map(|x| x.quotes.clone()).unwrap_or_default();
+        let custom_quotes = file
+            .as_ref()
+            .and_then(|x| x.quotes.clone())
+            .unwrap_or_default();
 
         let no_format = args
             .flag("no_format")
