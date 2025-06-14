@@ -1,13 +1,30 @@
+# The `imports` array can be used to split the config to multiple files.
+# Relative paths are resolved from the path of the module which included them.
+#
+# If two or more config files specify a value for the same option, an error
+# is raised. To resolve this, all properties below can be overriden by setting
+# them to `{ value = <desired value>, priority = -1 }`. After reading all
+# config files from `imports`, the value with the least priority is kept.
+# Properties where the value is not specified assume the default priority of
+# 500. For all proprties which are lists (except `imports`) items can be added
+# to the list either at the front or the back with:
+# `{ value = [...], order = "before"|"after" }`.
+#
+# NOTE: Some properties do not follow these rules. Check the docs for each one.
+imports = [
+  "cbundl2.toml"
+]
+
 [bundle]
 # Add separators between the contents of each source file inside the bundle.
 separators = true
 
-# Produce a deterministic bundle. This switch makes cbundl a pure function.
-# This means that for the same source files, the same bundle is always produced.
-# One sideffect is that dates will be displayed as the UNIX epoch and quotes
-# will always be the same. This switch is useful if you intend to check into
-# source control the bundle, where you wouldn't want to pollute diffs with
-# changed to the generated date, or the quotes inside the bundle.
+# Produce a deterministic bundle. This switch makes cbundl a pure function. This
+# means that for the same source files, the same bundle is always produced. One
+# sideffect is that dates will be displayed as the UNIX epoch and quotes will
+# always be the same. This switch is useful if you intend to check into source
+# control the bundle, where you wouldn't want to pollute diffs with changed to
+# the generated date, or the quotes inside the bundle.
 deterministic = true
 
 # Write the final bundle to this path.
@@ -21,16 +38,19 @@ output = "test/frob/final.c"
 # Whether to add the custom header.
 enable = true
 
-# The text to be added. Before you ask: yes, you can inject code from here but
-# you shouldn't have to. If you find yourself doing that, you are doing something
-# wrong.
+# The text to be added. Before you ask: yes, you can inject code from here
+# but you shouldn't have to. If you find yourself doing that, you are doing
+# something wrong.
+#
+# This property cannot be overriden. Multiple values are concatenated together
+# with '\n'.
 text = """
 // My amazing header text!
 """
 
-# Specify a file which contains the text for the header. The contents of the file
-# will be pasted in verbatim. This means that the file must contain the text in
-# C comments.
+# Specify a file which contains the text for the header. The contents of the
+# file will be pasted in verbatim. This means that the file must contain the
+# text in C comments.
 #source = "header.txt"
 
 # NOTE: `text` and `source` cannot be specified both at the same time.
@@ -69,7 +89,7 @@ enable = true
 path = "clang-format"
 
 # Extra arguments to pass to the formatter.
-args = ["--verbose", "--sort-includes"]
+args = ["--sort-includes"]
 
 
 # A custom quote.

@@ -62,7 +62,7 @@ impl<'a> Iterator for QuoteLinesIter<'a> {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Copy, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum QuotePicker {
     All,

@@ -1,0 +1,13 @@
+[header]
+# This text will be added to the banner.
+#
+# See `cbundl.toml` for more.
+text = """
+// Another part of my awesome banner!
+"""
+
+[banner.quote]
+enable = { value = false, priority = 100 }
+
+[formatter]
+args = { value = ["--verbose"], order = "before" }

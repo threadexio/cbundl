@@ -141,6 +141,8 @@ dependencies = [
  "env_logger",
  "eyre",
  "log",
+ "module",
+ "module-util",
  "owo-colors",
  "petgraph",
  "rand",
@@ -474,6 +476,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316"
 dependencies = [
  "adler2",
+]
+
+[[package]]
+name = "module"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "881b0dc4e40485c41af33b91ea617afc5eb2aef5e7060c53a00e2e0a5e2d0978"
+dependencies = [
+ "module-derive",
+ "serde",
+]
+
+[[package]]
+name = "module-derive"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a82ca27b67897c3ce068ee55ccf48eae2553ea1abb1ef757223a7bed262faa04"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "module-util"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6b647af0ae3559d352f9c8123403dd31662d6441b4af6ca952e96efdae33963"
+dependencies = [
+ "module",
+ "serde",
+ "toml",
 ]
 
 [[package]]
