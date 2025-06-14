@@ -147,5 +147,5 @@ fn choose_random<T, I>(iter: I) -> Option<T>
 where
     I: Iterator<Item = T>,
 {
-    iter.choose(&mut rand::thread_rng())
+    iter.choose(&mut rand::rng())
 }
