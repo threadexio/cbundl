@@ -7,7 +7,6 @@ use eyre::{Context, Result};
 use crate::banner::Banner;
 use crate::bundler::Bundler;
 use crate::config::Config;
-use crate::display::display_path;
 use crate::formatter::Formatter;
 use crate::header::Header;
 use crate::pipeline::Pipeline;
@@ -53,7 +52,7 @@ pub fn run() -> Result<()> {
 
     write_bundle(bundle, config.output_file.as_ref()).with_context(|| {
         if let Some(path) = config.output_file.as_ref() {
-            format!("failed to write bundle to `{}`", display_path(path))
+            format!("failed to write bundle to {}", display!(path))
         } else {
             "failed to write bundle to stdout".to_owned()
         }

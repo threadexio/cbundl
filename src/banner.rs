@@ -1,10 +1,9 @@
 use std::fmt::{self, Write};
 
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Local, TimeZone};
 use const_format::formatcp;
 
 use crate::consts::{CRATE_NAME, CRATE_REPOSITORY, SHORT_VERSION};
-use crate::display::format_date;
 use crate::pipeline::Stage;
 use crate::quotes::Quotes;
 
@@ -87,4 +86,12 @@ impl Stage for Banner {
         out.push_str(&code);
         Ok(out)
     }
+}
+
+fn format_date<Tz>(date: DateTime<Tz>) -> String
+where
+    Tz: TimeZone,
+    Tz::Offset: fmt::Display,
+{
+    date.format("%a %d %b %Y %H:%M:%S (UTC%:z)").to_string()
 }

@@ -1,23 +1,64 @@
-#![allow(non_camel_case_types)]
-
 use std::fmt::{self, Display};
-use std::path::Path;
 
-use chrono::{DateTime, TimeZone};
 use owo_colors::OwoColorize;
 
-pub struct display_path<T>(pub T);
+pub mod style {
+    use super::*;
 
-impl<T: AsRef<Path>> Display for display_path<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.0.as_ref().display().bright_cyan().fmt(f)
+    pub type StyleFn = fn(&dyn Display, f: &mut fmt::Formatter) -> fmt::Result;
+
+    pub fn path(x: &dyn Display, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "“{}”", x.bright_magenta())
     }
 }
 
-pub fn format_date<Tz>(date: DateTime<Tz>) -> String
+#[macro_export]
+macro_rules! display {
+    ($x:expr) => {{
+        $crate::display::_display_type(&$x)
+    }};
+    ($x:expr; as $style:ident) => {{
+        $crate::display::_display_styled(&$x, $crate::display::style::$style)
+    }};
+}
+
+#[allow(non_camel_case_types)]
+pub struct _display_type<'a, T>(pub &'a T)
 where
-    Tz: TimeZone,
-    Tz::Offset: Display,
+    T: ?Sized;
+
+impl<'a, 'b, T> Display for _display_type<'a, &'b T>
+where
+    _display_type<'b, T>: Display,
+    T: ?Sized,
 {
-    date.format("%a %d %b %Y %H:%M:%S (UTC%:z)").to_string()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        _display_type(*self.0).fmt(f)
+    }
+}
+
+impl Display for _display_type<'_, std::path::Path> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        style::path(&self.0.display(), f)
+    }
+}
+
+impl Display for _display_type<'_, std::path::PathBuf> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        style::path(&self.0.display(), f)
+    }
+}
+
+#[allow(non_camel_case_types)]
+pub struct _display_styled<'a, T>(pub &'a T, pub style::StyleFn)
+where
+    T: ?Sized;
+
+impl<'a, T> Display for _display_styled<'a, T>
+where
+    T: Display + ?Sized,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        (self.1)(&self.0, f)
+    }
 }

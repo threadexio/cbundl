@@ -7,12 +7,14 @@ use owo_colors::OwoColorize;
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+mod display;
+
 mod banner;
 mod bundler;
 mod cli;
 mod config;
 mod consts;
-mod display;
 mod formatter;
 mod header;
 mod parse;

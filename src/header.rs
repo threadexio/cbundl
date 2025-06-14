@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use eyre::{Context, Result};
 
-use crate::{display::display_path, pipeline::Stage};
+use crate::pipeline::Stage;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HeaderSource {
@@ -17,7 +17,7 @@ impl HeaderSource {
         match self {
             Self::Text(x) => Ok(Cow::Borrowed(x)),
             Self::File(ref x) => fs::read_to_string(x)
-                .with_context(|| format!("failed to read banner source `{}`", display_path(x)))
+                .with_context(|| format!("failed to read banner source {}", display!(x)))
                 .map(Cow::Owned),
         }
     }

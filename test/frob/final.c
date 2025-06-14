@@ -11,7 +11,7 @@
  *              / _| | '_ \| || || ' \))/ _` || |
  *              \__| |_.__/ \_,_||_||_| \__,_||_|
  *
- *                cbundl 0.1.4-debug (8644642+)
+ *                cbundl 0.1.4-debug (1045a5d+)
  *             https://github.com/threadexio/cbundl
  *
  *      Generated at: Thu 01 Jan 1970 00:00:00 (UTC+00:00)

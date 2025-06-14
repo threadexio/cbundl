@@ -4,7 +4,6 @@ use std::process::{Command, Stdio};
 
 use eyre::{bail, Context, Result};
 
-use crate::display::display_path;
 use crate::pipeline::Stage;
 
 #[derive(Debug, Clone)]
@@ -25,7 +24,7 @@ impl Stage for Formatter {
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
             .spawn()
-            .with_context(|| format!("failed to run formatter `{}`", display_path(&self.exe)))?;
+            .with_context(|| format!("failed to run formatter {}", display!(&self.exe)))?;
 
         p.stdin
             .as_mut()

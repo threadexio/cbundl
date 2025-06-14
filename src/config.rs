@@ -1,4 +1,4 @@
-use core::fmt;
+use std::fmt;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -14,7 +14,6 @@ use serde::Deserialize;
 use crate::consts::{
     CRATE_DESCRIPTION, DEFAULT_CONFIG_FILES, DEFAULT_FORMATTER, LONG_VERSION, SHORT_VERSION,
 };
-use crate::display::display_path;
 use crate::header::HeaderSource;
 use crate::quotes::{CustomQuote, QuotePicker};
 
@@ -200,7 +199,7 @@ impl File {
     fn read(path: &Path) -> Result<Self> {
         module_util::file::toml(path)
             .map_err(MergeErrorDisplay)
-            .with_context(|| format!("failed to read config `{}`", display_path(path)))
+            .with_context(|| format!("failed to read config {}", display!(path)))
     }
 
     fn read_many<'a, I>(paths: I) -> Option<Result<Self>>
@@ -211,16 +210,13 @@ impl File {
             match fs::metadata(path) {
                 Ok(_) => return Some(Self::read(path)),
                 Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                    debug!(
-                        "config file `{}` not found. skipping...",
-                        display_path(path)
-                    );
+                    debug!("config file {} not found. skipping...", display!(path));
                     continue;
                 }
                 Err(e) => {
-                    return Some(Err(e).with_context(|| {
-                        format!("failed to read config `{}`", display_path(path))
-                    }))
+                    return Some(
+                        Err(e).with_context(|| format!("failed to read config {}", display!(path))),
+                    )
                 }
             }
         }
@@ -413,13 +409,10 @@ impl fmt::Display for MergeErrorDisplay {
             writeln!(f, "    …while evaluating {value}")?;
         }
 
-        if !modules.is_empty() {
+        for x in modules.iter().rev() {
             writeln!(f)?;
-            writeln!(f, "    …in module")?;
-            modules
-                .iter()
-                .rev()
-                .try_for_each(|x| writeln!(f, "      …{x}"))?;
+            writeln!(f, "    …while evaluating module")?;
+            writeln!(f, "      …{}", display!(x; as path))?;
         }
 
         Ok(())

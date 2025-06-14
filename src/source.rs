@@ -8,7 +8,6 @@ use std::slice;
 use eyre::{bail, Context, Result};
 use petgraph::algo::toposort;
 
-use crate::display::display_path;
 use crate::parse::source_file::SourceFile;
 
 type Graph = petgraph::Graph<Source, (), petgraph::Directed, u32>;
@@ -42,18 +41,18 @@ impl SourceGraphBuilder {
     fn add_source_file(&mut self, path: PathBuf, kind: SourceKind) -> Result<NodeIndex> {
         fn realpath(path: &Path) -> Result<PathBuf> {
             fs::canonicalize(path)
-                .with_context(|| format!("failed to resolve path `{}`", display_path(path)))
+                .with_context(|| format!("failed to resolve path {}", display!(path)))
         }
 
         let raw_content = fs::read_to_string(&path)
-            .with_context(|| format!("failed to read source file `{}`", display_path(&path)))?;
+            .with_context(|| format!("failed to read source file {}", display!(path)))?;
 
         let SourceFile {
             content,
             impl_files,
             includes,
         } = SourceFile::try_parse(&raw_content)
-            .with_context(|| format!("failed to parse file `{}`", display_path(&path)))?;
+            .with_context(|| format!("failed to parse file {}", display!(path)))?;
 
         let base = match path.parent() {
             None => PathBuf::from("."),
